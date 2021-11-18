@@ -42,5 +42,10 @@ namespace ShadowTracker.Models
 
         [Display(Name = "File Extension")]
         public string AvatarContentType { get; set; }
+
+        public int CompanyId { get; set; }
+        public virtual Company Company { get; set; }
+
+        public virtual ICollection<Project> Projects { get; set; }
     }
 }
