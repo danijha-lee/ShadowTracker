@@ -11,7 +11,7 @@ namespace ShadowTracker.Models
 {
     public class Company
     {
-        public int CompanyId { get; set; }
+        public int Id { get; set; }
 
         [DisplayName("Company Name")]
         public string Name { get; set; }

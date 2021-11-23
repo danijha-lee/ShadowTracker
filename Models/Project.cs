@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using ShadowTracker.Models.Enums;
 
 namespace ShadowTracker.Models
 {
@@ -14,7 +15,7 @@ namespace ShadowTracker.Models
         public int Id { get; set; }
 
         [DisplayName("Company")]
-        public int ComapnyId { get; set; }
+        public int CompanyId { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -52,6 +53,7 @@ namespace ShadowTracker.Models
         //Navigation Properties
         public virtual Company Company { get; set; }
 
+        public int ProjectPriorityId { get; set; }
         public virtual ProjectPriority ProjectPriority { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; } = new HashSet<Notification>();
         public virtual ICollection<BTUser> Members { get; set; } = new HashSet<BTUser>();
