@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShadowTracker.Data;
 using ShadowTracker.Models;
+using ShadowTracker.Services.Factories;
 
 namespace ShadowTracker
 {
@@ -35,6 +36,7 @@ namespace ShadowTracker
 
             services.AddIdentity<BTUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddClaimsPrincipalFactory<BTUserClaimsPrincipalFactory>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
             services.AddControllersWithViews();

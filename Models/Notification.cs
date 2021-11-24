@@ -27,11 +27,11 @@ namespace ShadowTracker.Models
         public int? ProjectId { get; set; }
 
         [DisplayName("Recipient")]
-        public int? ReciepientId { get; set; }
+        public string ReciepientId { get; set; }
 
         [Required]
         [DisplayName("Sender")]
-        public int? SenderId { get; set; }
+        public string SenderId { get; set; }
 
         //Navigation Properties
         public virtual NotificationType NotificationType { get; set; }

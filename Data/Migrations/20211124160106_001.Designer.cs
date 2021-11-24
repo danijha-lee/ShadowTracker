@@ -10,8 +10,8 @@ using ShadowTracker.Data;
 namespace ShadowTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211118173157_BT Models Initial")]
-    partial class BTModelsInitial
+    [Migration("20211124160106_001")]
+    partial class _001
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -256,7 +256,7 @@ namespace ShadowTracker.Data.Migrations
 
             modelBuilder.Entity("ShadowTracker.Models.Company", b =>
                 {
-                    b.Property<int>("CompanyId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
@@ -276,7 +276,7 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.HasKey("CompanyId");
+                    b.HasKey("Id");
 
                     b.ToTable("Companies");
                 });
@@ -356,17 +356,14 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<int?>("ProjectId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("ReciepientId")
-                        .HasColumnType("integer");
+                    b.Property<string>("ReciepientId")
+                        .HasColumnType("text");
 
                     b.Property<string>("RecipientId")
                         .HasColumnType("text");
 
-                    b.Property<int?>("SenderId")
+                    b.Property<string>("SenderId")
                         .IsRequired()
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SenderId1")
                         .HasColumnType("text");
 
                     b.Property<int?>("TicketId")
@@ -386,7 +383,7 @@ namespace ShadowTracker.Data.Migrations
 
                     b.HasIndex("RecipientId");
 
-                    b.HasIndex("SenderId1");
+                    b.HasIndex("SenderId");
 
                     b.HasIndex("TicketId");
 
@@ -419,10 +416,7 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<bool>("Archived")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("ComapnyId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("CompanyId")
+                    b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Description")
@@ -446,7 +440,7 @@ namespace ShadowTracker.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int?>("ProjectPriorityId")
+                    b.Property<int>("ProjectPriorityId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("StartDate")
@@ -853,7 +847,9 @@ namespace ShadowTracker.Data.Migrations
 
                     b.HasOne("ShadowTracker.Models.BTUser", "Sender")
                         .WithMany()
-                        .HasForeignKey("SenderId1");
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ShadowTracker.Models.Ticket", "Ticket")
                         .WithMany("Notifications")
@@ -874,11 +870,15 @@ namespace ShadowTracker.Data.Migrations
                 {
                     b.HasOne("ShadowTracker.Models.Company", "Company")
                         .WithMany("Projects")
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ShadowTracker.Models.ProjectPriority", "ProjectPriority")
                         .WithMany()
-                        .HasForeignKey("ProjectPriorityId");
+                        .HasForeignKey("ProjectPriorityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Company");
 
@@ -975,7 +975,7 @@ namespace ShadowTracker.Data.Migrations
             modelBuilder.Entity("ShadowTracker.Models.TicketHistory", b =>
                 {
                     b.HasOne("ShadowTracker.Models.Ticket", "Ticket")
-                        .WithMany("Histories")
+                        .WithMany("History")
                         .HasForeignKey("TicketId1");
 
                     b.HasOne("ShadowTracker.Models.BTUser", "User")
@@ -1036,7 +1036,7 @@ namespace ShadowTracker.Data.Migrations
 
                     b.Navigation("Comments");
 
-                    b.Navigation("Histories");
+                    b.Navigation("History");
 
                     b.Navigation("Notifications");
 

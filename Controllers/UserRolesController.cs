@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using ShadowTracker.Models;
 using ShadowTracker.Models.ViewModels;
 using ShadowTracker.Services.Interfaces;
+using ShadowTracker.Extensions;
 
 namespace ShadowTracker.Controllers
 {
@@ -33,7 +34,7 @@ namespace ShadowTracker.Controllers
         public async Task<IActionResult> ManageUserRoles()
         {
             List<ManageUserRolesViewModel> model = new List<ManageUserRolesViewModel>();
-            int companyId = (await _userManager.GetUserAsync(User)).CompanyId;
+            int companyId = User.Identity.GetCompanyId().Value;
             List<BTUser> users = await _companyInfoService.GetAllMembersAsync(companyId);
 
             foreach (BTUser user in users)
