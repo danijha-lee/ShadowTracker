@@ -26,6 +26,14 @@ namespace ShadowTracker.Models
         public DateTimeOffset Created { get; set; }
 
         [DataType(DataType.Date)]
+        [DisplayName("Start Date")]
+        public DateTimeOffset StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayName("Due Date")]
+        public DateTimeOffset DueDate { get; set; }
+
+        [DataType(DataType.Date)]
         [DisplayName("Updated Date")]
         public DateTimeOffset? Updated { get; set; }
 

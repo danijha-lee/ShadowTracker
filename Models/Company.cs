@@ -27,7 +27,7 @@ namespace ShadowTracker.Models
         public string ImageFileName { get; set; }
 
         [DisplayName(" Company Image")]
-        public string ImageFileData { get; set; }
+        public byte[] ImageFileData { get; set; }
 
         [DisplayName(" File Extension")]
         public string ImageContentType { get; set; }

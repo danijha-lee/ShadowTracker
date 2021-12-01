@@ -17,18 +17,21 @@ namespace ShadowTracker.Services
         private readonly ApplicationDbContext _context;
         private readonly IBTRolesService _rolesService;
         private readonly IBTProjectService _projectService;
+        private readonly IBTLookupService _lookupService;
 
         #endregion Properties
 
         #region Constructor
 
         public BTTicketService(ApplicationDbContext context,
-                        IBTRolesService rolesService,
-                        IBTProjectService projectService)
+                                IBTRolesService rolesService,
+                                IBTProjectService projectService,
+                                IBTLookupService lookupService)
         {
             _context = context;
             _rolesService = rolesService;
             _projectService = projectService;
+            _lookupService = lookupService;
         }
 
         #endregion Constructor

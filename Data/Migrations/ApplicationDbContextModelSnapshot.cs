@@ -265,8 +265,8 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("ImageContentType")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageFileData")
-                        .HasColumnType("text");
+                    b.Property<byte[]>("ImageFileData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageFileName")
                         .HasColumnType("text");
@@ -417,9 +417,11 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp without time zone");
@@ -427,16 +429,15 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("ImageContentType")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageFileData")
-                        .HasColumnType("text");
+                    b.Property<byte[]>("ImageFileData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageFileName")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<int>("ProjectPriorityId")
                         .HasColumnType("integer");
@@ -492,11 +493,17 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("DeveloperUserId")
                         .HasColumnType("text");
 
+                    b.Property<DateTimeOffset>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("OwnerUserId")
                         .HasColumnType("text");
 
                     b.Property<int>("ProjectId")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("StartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("TicketPriorityId")
                         .HasColumnType("integer");

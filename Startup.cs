@@ -13,7 +13,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShadowTracker.Data;
 using ShadowTracker.Models;
+using ShadowTracker.Services;
 using ShadowTracker.Services.Factories;
+using ShadowTracker.Services.Interfaces;
 
 namespace ShadowTracker
 {
@@ -39,6 +41,13 @@ namespace ShadowTracker
                 .AddClaimsPrincipalFactory<BTUserClaimsPrincipalFactory>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
+            services.AddScoped<IBTProjectService, BTProjectService>();
+            services.AddScoped<IBTCompanyInfoService, BTCompanyInfoService>();
+            services.AddScoped<IBTRolesService, BTRolesService>();
+            services.AddScoped<IBTTicketService, BTTicketService>();
+            services.AddScoped<IBTLookupService, BTLookupService>();
+            services.AddScoped<IBTFileService, BTFileService>();
+            services.AddScoped<IImageService, BasicImageService>();
             services.AddControllersWithViews();
         }
 

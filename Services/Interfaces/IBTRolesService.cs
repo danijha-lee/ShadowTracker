@@ -13,7 +13,7 @@ namespace ShadowTracker.Services.Interfaces
 
         public Task<List<IdentityRole>> GetRolesAsync();
 
-        public Task<string> GetRolesNameByIdAsync(string roleId);
+        public Task<string> GetRoleNameByIdAsync(string roleId);
 
         public Task<List<BTUser>> GetUsersInRoleAsync(string roleName, int companyId);
 

@@ -18,13 +18,14 @@ namespace ShadowTracker.Models
         public int CompanyId { get; set; }
 
         [Required]
-        [StringLength(50)]
         [DisplayName("Project Name")]
         public string Name { get; set; }
 
-        [StringLength(50)]
         [DisplayName(" Description")]
         public string Description { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime Created { get; set; }
 
         [DisplayName("Start Date")]
         [DataType(DataType.Date)]
@@ -42,7 +43,7 @@ namespace ShadowTracker.Models
         public string ImageFileName { get; set; }
 
         [DisplayName(" Project Image")]
-        public string ImageFileData { get; set; }
+        public byte[] ImageFileData { get; set; }
 
         [DisplayName(" File Extension")]
         public string ImageContentType { get; set; }

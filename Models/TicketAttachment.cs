@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using ShadowTracker.Extensions;
 
 namespace ShadowTracker.Models
 {
@@ -28,7 +29,10 @@ namespace ShadowTracker.Models
         public string Description { get; set; }
 
         [NotMapped]
+        [DisplayName("Select a file")]
         [DataType(DataType.Upload)]
+        [MaxFileSize(1024 * 1024)]
+        [AllowedExtensions(new string[] { ".jpg", ".png", ".doc", ".docx", ".xls", ".xlsx", ".pdf" })]
         public IFormFile FormFile { get; set; }
 
         [DisplayName("File Name")]

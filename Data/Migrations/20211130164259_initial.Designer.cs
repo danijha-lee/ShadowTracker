@@ -10,8 +10,8 @@ using ShadowTracker.Data;
 namespace ShadowTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20211124160106_001")]
-    partial class _001
+    [Migration("20211130164259_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -267,8 +267,8 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("ImageContentType")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageFileData")
-                        .HasColumnType("text");
+                    b.Property<byte[]>("ImageFileData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageFileName")
                         .HasColumnType("text");
@@ -419,9 +419,11 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("timestamp without time zone");
@@ -429,16 +431,15 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("ImageContentType")
                         .HasColumnType("text");
 
-                    b.Property<string>("ImageFileData")
-                        .HasColumnType("text");
+                    b.Property<byte[]>("ImageFileData")
+                        .HasColumnType("bytea");
 
                     b.Property<string>("ImageFileName")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.Property<int>("ProjectPriorityId")
                         .HasColumnType("integer");
