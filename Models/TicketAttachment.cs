@@ -18,7 +18,6 @@ namespace ShadowTracker.Models
         [DisplayName("Ticket Task")]
         public int? TicketTaskId { get; set; }
 
-        [Required]
         public string UserId { get; set; }
 
         [DisplayName("Attachment Date")]

@@ -48,6 +48,7 @@ namespace ShadowTracker
             services.AddScoped<IBTLookupService, BTLookupService>();
             services.AddScoped<IBTFileService, BTFileService>();
             services.AddScoped<IImageService, BasicImageService>();
+            services.AddScoped<IBTTicketHistoryService, BTTicketHistoryService>();
             services.AddControllersWithViews();
         }
 
@@ -77,7 +78,7 @@ namespace ShadowTracker
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Landing}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

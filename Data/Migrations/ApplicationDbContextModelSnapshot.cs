@@ -568,7 +568,6 @@ namespace ShadowTracker.Data.Migrations
                         .HasColumnType("integer");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -632,10 +631,7 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("Property")
                         .HasColumnType("text");
 
-                    b.Property<string>("TicketId")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("TicketId1")
+                    b.Property<int>("TicketId")
                         .HasColumnType("integer");
 
                     b.Property<string>("UserId")
@@ -643,7 +639,7 @@ namespace ShadowTracker.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TicketId1");
+                    b.HasIndex("TicketId");
 
                     b.HasIndex("UserId");
 
@@ -951,9 +947,7 @@ namespace ShadowTracker.Data.Migrations
 
                     b.HasOne("ShadowTracker.Models.BTUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("Ticket");
 
@@ -981,7 +975,9 @@ namespace ShadowTracker.Data.Migrations
                 {
                     b.HasOne("ShadowTracker.Models.Ticket", "Ticket")
                         .WithMany("History")
-                        .HasForeignKey("TicketId1");
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("ShadowTracker.Models.BTUser", "User")
                         .WithMany()

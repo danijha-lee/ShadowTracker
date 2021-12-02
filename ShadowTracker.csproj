@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\img\contenttype\" />
+    <Folder Include="wwwroot\assests\" />
   </ItemGroup>
 
 </Project>
