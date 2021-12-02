@@ -17,29 +17,30 @@ namespace ShadowTracker.Controllers
 {
     public class TicketsController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IBTTicketService _ticketService;
         private readonly UserManager<BTUser> _userManager;
         private readonly IBTLookupService _lookupService;
         private readonly IBTProjectService _projectService;
         private readonly IBTCompanyInfoService _companyInfoService;
         private readonly IBTFileService _fileService;
+        private readonly IBTRolesService _rolesService;
 
-        public TicketsController(ApplicationDbContext context,
+        public TicketsController(
                                 IBTTicketService ticketService,
                                 UserManager<BTUser> userManager,
                                 IBTLookupService lookupService,
                                 IBTProjectService projectService,
                                 IBTCompanyInfoService companyInfoService,
-                                IBTFileService fileService)
+                                IBTFileService fileService,
+                                IBTRolesService rolesService)
         {
-            _context = context;
             _ticketService = ticketService;
             _userManager = userManager;
             _lookupService = lookupService;
             _projectService = projectService;
             _companyInfoService = companyInfoService;
             _fileService = fileService;
+            _rolesService = rolesService;
         }
 
         //GET: All Tickets
@@ -77,14 +78,7 @@ namespace ShadowTracker.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
-                .Include(t => t.DeveloperUser)
-                .Include(t => t.OwnerUser)
-                .Include(t => t.Project)
-                .Include(t => t.TicketPriority)
-                .Include(t => t.TicketStatus)
-                .Include(t => t.TicketType)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            Ticket ticket = await _ticketService.GetTicketByIdAsync(id.Value);
             if (ticket == null)
             {
                 return NotFound();
@@ -106,25 +100,27 @@ namespace ShadowTracker.Controllers
 
         //POST : Tickets/ AddTicketComment
         [HttpPost]
-        public async Task<IActionResult> AddTicketComment(TicketComment comment)
+        public async Task<IActionResult> AddTicketComment([Bind("TicketId,Comment,Id")] TicketComment ticketComment)
         {
             if (ModelState.IsValid)
             {
                 string userId = _userManager.GetUserId(User);
                 try
                 {
-                    comment.Created = DateTime.Now;
-                    comment.UserId = userId;
-                    await _ticketService.AddTicketCommentAsync(comment);
-                    await _ticketService.UpdateTicketAsync(comment.Ticket);
-                    return View(nameof(Details));
+                    //ticketComment.TicketId = ticketComment.TicketId;
+                    ticketComment.Created = DateTime.Now;
+                    ticketComment.UserId = userId;
+                    await _ticketService.AddTicketCommentAsync(ticketComment);
+                    //await _ticketService.UpdateTicketAsync(ticketComment.Ticket);
+
+                    return RedirectToAction(nameof(Details), new { id = ticketComment.TicketId });
                 }
                 catch (Exception)
                 {
                     throw;
                 }
             }
-            return View(comment);
+            return View(ticketComment);
         }
 
         [HttpPost]
@@ -159,7 +155,6 @@ namespace ShadowTracker.Controllers
             string userId = _userManager.GetUserId(User);
             //int projectId =
             int companyId = User.Identity.GetCompanyId().Value;
-            //ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
 
             if (User.IsInRole(nameof(BTRoles.Admin)))
             {
@@ -169,7 +164,6 @@ namespace ShadowTracker.Controllers
             {
                 ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(userId), "Id", "Name");
             }
-            //ViewData["DeveloperUserId"] = new SelectList(await _projectService.GetAllProjectMembersExceptPMAsync(projectId), "Id", "Name");
 
             ViewData["TicketPriorityId"] = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
 
@@ -221,17 +215,15 @@ namespace ShadowTracker.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets.FindAsync(id);
+            Ticket ticket = await _ticketService.GetTicketByIdAsync(id.Value);
             if (ticket == null)
             {
                 return NotFound();
             }
-            ViewData["DeveloperUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.DeveloperUserId);
-            ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.OwnerUserId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", ticket.ProjectId);
-            ViewData["TicketPriorityId"] = new SelectList(_context.TicketPriorities, "Id", "Id", ticket.TicketPriorityId);
-            ViewData["TicketStatusId"] = new SelectList(_context.TicketStatuses, "Id", "Id", ticket.TicketStatusId);
-            ViewData["TicketTypeId"] = new SelectList(_context.TicketTypes, "Id", "Id", ticket.TicketTypeId);
+
+            ViewData["TicketPriorityId"] = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
+            ViewData["TicketStatusId"] = new SelectList(await _lookupService.GetTicketStatusesAsync(), "Id", "Name");
+            ViewData["TicketTypeId"] = new SelectList(await _lookupService.GetTicketTypesAsync(), "Id", "Name");
             return View(ticket);
         }
 
@@ -240,7 +232,7 @@ namespace ShadowTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Created,Updated,Archived,ArchivedByProject,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,DeveloperUserId")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,ProjectId,TicketTypeId,TicketPriorityId,TicketStatusId,OwnerUserId,")] Ticket ticket)
         {
             if (id != ticket.Id)
             {
@@ -251,12 +243,12 @@ namespace ShadowTracker.Controllers
             {
                 try
                 {
-                    _context.Update(ticket);
-                    await _context.SaveChangesAsync();
+                    ticket.Updated = DateTime.Now;
+                    await _ticketService.UpdateTicketAsync(ticket);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TicketExists(ticket.Id))
+                    if (!await TicketExists(ticket.Id))
                     {
                         return NotFound();
                     }
@@ -265,33 +257,25 @@ namespace ShadowTracker.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(AllTickets));
             }
-            ViewData["DeveloperUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.DeveloperUserId);
-            ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.OwnerUserId);
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name", ticket.ProjectId);
-            ViewData["TicketPriorityId"] = new SelectList(_context.TicketPriorities, "Id", "Id", ticket.TicketPriorityId);
-            ViewData["TicketStatusId"] = new SelectList(_context.TicketStatuses, "Id", "Id", ticket.TicketStatusId);
-            ViewData["TicketTypeId"] = new SelectList(_context.TicketTypes, "Id", "Id", ticket.TicketTypeId);
+            int companyId = User.Identity.GetCompanyId().Value;
+            ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
+            ViewData["TicketPriorityId"] = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
+            ViewData["TicketStatusId"] = new SelectList(await _lookupService.GetTicketStatusesAsync(), "Id", "Name", ticket.TicketStatusId);
+            ViewData["TicketTypeId"] = new SelectList(await _lookupService.GetTicketTypesAsync(), "Id", "Name", ticket.TicketTypeId);
             return View(ticket);
         }
 
         // GET: Tickets/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Archive(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
-                .Include(t => t.DeveloperUser)
-                .Include(t => t.OwnerUser)
-                .Include(t => t.Project)
-                .Include(t => t.TicketPriority)
-                .Include(t => t.TicketStatus)
-                .Include(t => t.TicketType)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            Ticket ticket = await _ticketService.GetTicketByIdAsync(id.Value);
             if (ticket == null)
             {
                 return NotFound();
@@ -303,17 +287,19 @@ namespace ShadowTracker.Controllers
         // POST: Tickets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> ArchiveConfirmed(int id)
         {
-            var ticket = await _context.Tickets.FindAsync(id);
-            _context.Tickets.Remove(ticket);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            Ticket ticket = await _ticketService.GetTicketByIdAsync(id);
+            ticket.Archived = true;
+            await _ticketService.UpdateTicketAsync(ticket);
+            return RedirectToAction(nameof(AllTickets));
         }
 
-        private bool TicketExists(int id)
+        private async Task<bool> TicketExists(int id)
         {
-            return _context.Tickets.Any(e => e.Id == id);
+            int companyId = User.Identity.GetCompanyId().Value;
+
+            return (await _ticketService.GetAllTicketsByCompanyAsync(companyId)).Any(t => t.Id == id);
         }
     }
 }

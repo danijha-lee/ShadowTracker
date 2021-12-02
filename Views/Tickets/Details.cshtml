@@ -11,7 +11,7 @@
 @{
     ViewData["Title"] = "Details";
     BTUser btUser = await _userManager.GetUserAsync(User);
-    int projectId = Model.ProjectId;
+    int projectId = Model.Project.Id;
     BTUser projectManager = await _projectService.GetProjectManagerAsync(projectId);
 
 }
@@ -60,9 +60,9 @@
                         <div class="card-body">
                             <ul class="list-unstyled">
                                 @*Ticket date*@
-                                <li><strong>Date Entered:</strong> <span class=""> @Model.Created.ToString("dd/mm/yy")</span></li>
+                                <li><strong>Date Entered:</strong> <span class=""> @Model.Created.ToString("dd/MM/yy")</span></li>
                                 @*Project end date*@
-                                <li><strong>Deadline:</strong> <span class="">@Model.DueDate.ToString("dd/mm/yy") </span></li>
+                                <li><strong>Deadline:</strong> <span class="">@Model.DueDate.ToString("dd/MM/yy") </span></li>
                                 @*Ticket type*@
                                 <li><strong>Type:</strong> <span class=""> @Model.TicketType.Name</span></li>
                                 @*Ticket priority*@
@@ -88,7 +88,7 @@
                                     @if (Model.DeveloperUserId == btUser.Id || Model.OwnerUserId == btUser.Id || projectManager?.Id == btUser.Id || User.IsInRole(nameof(BTRoles.Admin)))
                                     {
                                         <div class="form-group">
-                                            <input id="editor" asp-for="@(new TicketComment().Comment)" rows="8" class="form-control" required placeholder="Add comment ..." />
+                                            <textarea id="editor" asp-for="@(new TicketComment().Comment)" rows="8" class="form-control" required placeholder="Add comment ..."></textarea>
                                         </div>
                                         <button class="btn btn-sm btn-primary">Submit</button> }
                                     else

@@ -18,6 +18,16 @@ namespace ShadowTracker.Controllers
             _logger = logger;
         }
 
+        public IActionResult Landing()
+        {
+            return View();
+        }
+
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+
         public IActionResult Index()
         {
             return View();
