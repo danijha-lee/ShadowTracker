@@ -48,8 +48,14 @@
                                 <span class="progress-badge" style="font-size:small">Project: @Model.Project.Name</span>
                                 <div class="progress">
                                     @*Progress bar logic*@
+                                    @{
+                                        var start = Model.Project.StartDate.Value;
+                                        var end = Model.Project.EndDate.Value;
+                                        var today = DateTime.Now;
+                                        var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+                                    }
                                     @*Variable from razor logic*@
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: [Percent]%;">
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: percent;">
                                         @*Variable from razor logic*@
                                         <span class="progress-value">[Percent]%</span>
                                     </div>
@@ -63,7 +69,7 @@
                                 @*Ticket date*@
                                 <li><strong>Date Entered:</strong> <span class=""> @Model.Created.ToString("dd/MM/yy")</span></li>
                                 @*Project end date*@
-                                <li><strong>Deadline:</strong> <span class="">@Model.DueDate.ToString("dd/MM/yy") </span></li>
+                                <li><strong>Deadline:</strong> <span class="">@Model.DueDate.Value.ToString("dd/MM/yy") </span></li>
                                 @*Ticket type*@
                                 <li><strong>Type:</strong> <span class=""> @Model.TicketType.Name</span></li>
                                 @*Ticket priority*@
@@ -201,18 +207,29 @@
                         </div>
                         <div class="card-body" style="overflow-y:auto;height:1000px;background-color:antiquewhite">
                             @*Loop to show the history entries for the Ticket*@
-                            @foreach (TicketHistory history in await _ticketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, btUser.CompanyId))
-                            {
-                                <div class="">
-                                    <span class="date">@history.Created.ToString("dd MMM yyyy")</span>
-                                    <h6>@history.Description</h6>
-                                    <span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
+                            <div class="card-body" style="overflow-y:auto;height:1000px;background-color:antiquewhite">
+                                @foreach (TicketHistory history in Model.History)
+                                {
                                     <div class="">
-                                        <p>The ticket <b>@history.Property</b>  was edited</p>
-                                        <p>@($"Previous {history.Property}:  {history.OldValue}")</p>
-                                        <p>@($"Current {history.Property}:  {history.NewValue}")</p>
+                                        <span class="date" style="font-weight:bold">@history.Created.ToString("dd MMM yyyy")</span>
+                                        <h6>@history.Description</h6>
+                                        <span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
+                                        <div class="">
+                                            @if (history.Description.Contains("New Ticket Created"))
+                                            {
+                                                <p>A ticket was added.</p> }
+                                            else if (history.Property.Equals("TicketComment") || history.Property.Equals("TicketAttachment"))
+                                            {
+                                                <p>A <b>@history.Property</b>  was added.</p> }
+                                            else
+                                            {
+                                                <p>The ticket <b>@history.Property</b>  was edited</p>
+                                                <p>@($"Previous {history.Property}:  ") <span style="color:red">@history.OldValue</span></p>
+                                                <p>@($"Current {history.Property}:  ") <span style="color:green">@history.NewValue</span></p>}
+                                        </div>
                                     </div>
-                                </div>}
+                                    <hr />}
+                            </div>
                         </div>
                     </div>
                 </div>

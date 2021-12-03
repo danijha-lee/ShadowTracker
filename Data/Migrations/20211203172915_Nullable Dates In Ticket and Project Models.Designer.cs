@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShadowTracker.Data;
@@ -9,9 +10,10 @@ using ShadowTracker.Data;
 namespace ShadowTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211203172915_Nullable Dates In Ticket and Project Models")]
+    partial class NullableDatesInTicketandProjectModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,17 +297,17 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<DateTime>("InviteDate")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("InviteeEmail")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("InviteeEmail")
+                        .HasColumnType("timestamp without time zone");
 
-                    b.Property<string>("InviteeFirstName")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("InviteeFirstName")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("InviteeId")
                         .HasColumnType("text");
 
-                    b.Property<string>("InviteeLastName")
-                        .HasColumnType("text");
+                    b.Property<DateTime>("InviteeLastName")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("InvitorId")
                         .HasColumnType("text");

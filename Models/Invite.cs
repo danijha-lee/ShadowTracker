@@ -33,13 +33,13 @@ namespace ShadowTracker.Models
 
         [DataType(DataType.EmailAddress)]
         [DisplayName("Invitee Email ")]
-        public DateTime InviteeEmail { get; set; }
+        public string InviteeEmail { get; set; }
 
         [DisplayName("Invitee First Name ")]
-        public DateTime InviteeFirstName { get; set; }
+        public string InviteeFirstName { get; set; }
 
         [DisplayName("Invitee Lase Name ")]
-        public DateTime InviteeLastName { get; set; }
+        public string InviteeLastName { get; set; }
 
         public bool IsValid { get; set; }
 

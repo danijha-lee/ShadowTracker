@@ -116,7 +116,7 @@ namespace ShadowTracker.Controllers
                     ticketComment.Created = DateTime.Now;
                     ticketComment.UserId = userId;
                     await _ticketService.AddTicketCommentAsync(ticketComment);
-                    await _ticketHistoryService.AddHistoryAsync(ticketComment.Id, nameof(TicketComment), ticketComment.UserId);
+                    await _ticketHistoryService.AddHistoryAsync(ticketComment.TicketId, nameof(TicketComment), ticketComment.UserId);
 
                     return RedirectToAction(nameof(Details), new { id = ticketComment.TicketId });
                 }
