@@ -16,6 +16,8 @@ namespace ShadowTracker.Services.Interfaces
 
         public Task<Ticket> GetTicketByIdAsync(int ticketId);
 
+        public Task<List<TicketComment>> GetTicketCommentsAsync(int ticketId);
+
         public Task ArchiveTicketAsync(Ticket ticket);
 
         public Task AddTicketAttachmentAsync(TicketAttachment ticketAttachment);
@@ -59,5 +61,7 @@ namespace ShadowTracker.Services.Interfaces
         public Task<int?> LookupTicketStatusIdAsync(string statusName);
 
         public Task<int?> LookupTicketTypeIdAsync(string typeName);
+
+        public Task<int> GetProjectCommentCountAsync(int projectId);
     }
 }

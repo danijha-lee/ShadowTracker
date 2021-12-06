@@ -1,101 +1,686 @@
-﻿@model IEnumerable<ShadowTracker.Models.Ticket>
+﻿@model ShadowTracker.Models.ViewModels.TicketFilterViewModel
+@using Microsoft.AspNetCore.Identity
+@using ShadowTracker.Services.Interfaces
+@using ShadowTracker.Models.Enums 
+@inject IBTTicketService _ticketService
+@inject IBTProjectService _projectService
+@inject UserManager<BTUser> _userManager
+@inject IBTLookupService _lookupService
 
 @{
     ViewData["Title"] = "All Tickets";
+    BTUser user = await _userManager.GetUserAsync(User);
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Created)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Updated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Archived)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ArchivedByProject)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Project)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TicketType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TicketPriority)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TicketStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OwnerUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeveloperUser)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Created)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Updated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Archived)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ArchivedByProject)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Project.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TicketType.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TicketPriority.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TicketStatus.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OwnerUser.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DeveloperUser.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Container-fluid starts-->
+<div class="container-fluid">
+    <div class="email-wrap bookmark-wrap">
+        <div class="row">
+            <div class="col-xl-3 box-col-4 xl-30">
+                <div class="email-sidebar">
+                    <a class="btn btn-primary email-aside-toggle" href="javascript:void(0)">bookmark filter</a>
+                    <div class="email-left-aside">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="email-app-sidebar left-bookmark">
+                                    <div class="media">
+                                        <div class="media-size-email"><img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt=""></div>
+                                        <div class="media-body">
+                                            <h6 class="f-w-600">@user.FullName</h6>
+                                            <p>@user.Email</p>
+                                        </div>
+                                    </div>
+                                    <ul class="nav main-menu" role="tablist">
+                                        <li class="nav-item">
+                                            <button class="badge-light btn-block btn-mail" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="me-2" data-feather="check-circle"></i>New Task</button>
+                                            <div class="modal fade modal-bookmark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Add Task</h5>
+                                                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close">                                                 </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form class="form-bookmark needs-validation"
+                                                                  id="bookmark-form" asp-action="Create"
+                                                                  asp-controller="Tickets" method="post">
+                                                                <div asp-validation-summary="ModelOnly"
+                                                                     class="text-danger"></div>
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-12">
+                                                                        <label>Ticket Title</label>
+                                                                        <input class="form-control" id="task-title"
+                                                                               name="Title">
+                                                                    </div>
+                                                                    <div class="form-group col-md-12">
+                                                                        <label for="sub-task">Description</label>
+                                                                        <input class="form-control" id="sub-task"
+                                                                               type="text" name="Description">
+                                                                    </div>
+                                                                    <div class="form-group col-md-12">
+                                                                        <label for="sub-task">Project</label>
+                                                                        <select class="form-control" id="sub-task"
+                                                                                name="ProjectId"
+                                                                                asp-items="ViewBag.ProjectId">
+                                                                            <option>Choose...</option>
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="row">
+                                                                        <label>Priority</label>
+                                                                        <div class="form-group col">
+                                                                            <select class="js-example-basic-single"
+                                                                                    name="TicketTypeId"
+                                                                                    asp-items="Model.TicketPrioritySelectList">
+                                                                                <option>Select..</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <label>Type</label>
+                                                                        <div class="form-group col">
+                                                                            <select class="js-example-disabled-results"
+                                                                                    name="TicketPriorityId"
+                                                                                    asp-items="Model.TicketTypeSelectList">
+                                                                                <option>Select..</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
+
+                                                                <button class="btn btn-secondary" @*id="Bookmark"
+                                                                    onclick="submitBookMark()" *@
+                                                                        type="submit">
+                                                                    Save
+                                                                </button>
+                                                                <button class="btn btn-primary" type="button"
+                                                                        data-bs-dismiss="modal">
+                                                                    Cancel
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="nav-item"><span class="main-title"> Priority</span></li>
+                                        <li><a id="pills-created-tab" data-bs-toggle="pill" href="#AllTickets" role="tab" aria-controls="pills-created" aria-selected="true"><span class="title"> All Tickets</span></a></li>
+                                        <li><a class="show" id="pills-todaytask-tab" data-bs-toggle="pill" href="#UrgentTickets" role="tab" aria-controls="pills-todaytask" aria-selected="false"><span class="title">Urgent </span></a></li>
+                                        <li><a class="show" id="pills-delayed-tab" data-bs-toggle="pill" href="#HighPriority" role="tab" aria-controls="pills-delayed" aria-selected="false"><span class="title"> High </span></a></li>
+                                        <li><a class="show" id="pills-upcoming-tab" data-bs-toggle="pill" href="#MediumPriority" role="tab" aria-controls="pills-upcoming" aria-selected="false"><span class="title">Medium </span></a></li>
+                                        <li><a class="show" id="pills-weekly-tab" data-bs-toggle="pill" href="#LowPriority" role="tab" aria-controls="pills-weekly" aria-selected="false"><span class="title">Low </span></a></li>
+                                        <li>
+                                            <hr>
+                                        </li>
+                                        <li><span class="main-title"> Type<span class="pull-right"><a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#createtag"><i data-feather="plus-circle"></i></a></span></span></li>
+                                        <li><a class="show" id="pills-monthly-tab" data-bs-toggle="pill" href="#Enhancement" role="tab" aria-controls="pills-monthly" aria-selected="false"><span class="title">Enhancement</span></a></li>
+                                        <li><a class="show" id="pills-assigned-tab" data-bs-toggle="pill" href="#ChangeRequest" role="tab" aria-controls="pills-assigned" aria-selected="false"><span class="title">Change Request</span></a></li>
+                                        <li><a class="show" id="pills-tasks-tab" data-bs-toggle="pill" href="#Defect" role="tab" aria-controls="pills-tasks" aria-selected="false"><span class="title">Defect</span></a></li>
+                                        <li><a class="show" id="pills-notification-tab" data-bs-toggle="pill" href="#WorkTask" role="tab" aria-controls="pills-notification" aria-selected="false"><span class="title"> Work Task</span></a></li>
+                                        <li><a class="show" id="pills-newsletter-tab" data-bs-toggle="pill" href="#NewDevelopment" role="tab" aria-controls="pills-newsletter" aria-selected="false"><span class="title"> New Development</span></a></li>
+                                        <li><a class="show" id="pills-newsletter-tab" data-bs-toggle="pill" href="#GeneralTask" role="tab" aria-controls="pills-newsletter" aria-selected="false"><span class="title"> General Task</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-9 col-md-12 box-col-8 xl-70">
+                <div class="email-right-aside bookmark-tabcontent">
+                    <div class="card email-body radius-left">
+                        <div class="ps-0">
+                            <div class="tab-content">
+                                <div class="tab-pane fade active show" id="AllTickets" role="tabpanel" aria-labelledby="pills-created-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">ALL TICKETS</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="taskadd">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        @if (Model.Tickets.Count == 0)
+                                                        {
+                                                            <div class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            @foreach (Ticket ticket in Model.Tickets)
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <a asp-action="Details" asp-controller="Tickets"
+                                                                           asp-route-id="@ticket.Id">
+                                                                            <h5 class="task_title_0">@ticket.Title</h5>
+                                                                        </a>
+                                                                        <p class="project_name_0">
+                                                                            <a>@ticket.TicketStatus.Name</a>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p class="task_desc_0">@ticket.Description</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="me-2" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets">
+                                                                            <i data-feather="link"></i>
+                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket.Id">
+                                                                            <i data-feather="more-horizontal"></i>
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="trash-2"></i></a>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+                                                        }
+
+                                                        </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="UrgentTickets" role="tabpanel" aria-labelledby="pills-todaytask-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">URGENT TICKETS</h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="taskadd">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        @if (Model.Tickets.Where(t => t.TicketPriority.Name == "Urgent").Count() == 0)
+                                                        {
+                                                            <div class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                        @foreach (Ticket ticket1 in Model.Tickets.Where(t => t.TicketPriority.Name == "Urgent"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
+                                                                       asp-route-id="@ticket1.Id">
+                                                                        <h5 class="task_title_0">@ticket1.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket1.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket1.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket1.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
+
+                                                            </tr>
+                                                        }
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="HighPriority" role="tabpanel" aria-labelledby="pills-delayed-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">HIGH PRIORITY TICKETS</h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="taskadd">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        @foreach (Ticket ticket2 in Model.Tickets.Where(t => t.TicketPriority.Name == "High"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
+                                                                       asp-route-id="@ticket2.Id">
+                                                                        <h5 class="task_title_0">@ticket2.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket2.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket2.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket2.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="MediumPriority" role="tabpanel" aria-labelledby="pills-upcoming-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0"> MEDIUM PRIORITY TICKETS</h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="taskadd">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        @foreach (Ticket ticket3 in Model.Tickets.Where(t => t.TicketPriority.Name == "Medium"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
+                                                                       asp-route-id="@ticket3.Id">
+                                                                        <h5 class="task_title_0">@ticket3.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket3.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket3.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket3.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="LowPriority" role="tabpanel" aria-labelledby="pills-weekly-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">LOW PRIORITY TICKETS</h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="taskadd">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        @foreach (Ticket ticket4 in Model.Tickets.Where(t => t.TicketPriority.Name == "Low"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
+                                                                       asp-route-id="@ticket4.Id">
+                                                                        <h5 class="task_title_0">@ticket4.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket4.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket4.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket4.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
+                                                                
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="Enhancement" role="tabpanel" aria-labelledby="pills-monthly-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">ENHANCEMENT TICKETS</h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="taskadd">
+                                                <div class="table-responsive">
+                                                    <table class="table">
+                                                        @foreach (Ticket ticket5 in Model.Tickets.Where(t => t.TicketType.Name == "Enhancement"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
+                                                                       asp-route-id="@ticket5.Id">
+                                                                        <h5 class="task_title_0">@ticket5.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket5.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket5.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket5.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
+                                                               
+                                                            </tr>
+                                                        }
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="ChangeRequest" role="tabpanel" aria-labelledby="pills-assigned-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">CHANGE REQUEST TICKETS</h6>
+                                        </div>
+                                        <div class="taskadd">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    @foreach (Ticket ticket6 in Model.Tickets.Where(t => t.TicketType.Name == "ChangeRequest"))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a asp-action="Details" asp-controller="Tickets"
+                                                                   asp-route-id="@ticket6.Id">
+                                                                    <h5 class="task_title_0">@ticket6.Title</h5>
+                                                                </a>
+                                                                <p class="project_name_0">
+                                                                    <a>@ticket6.TicketStatus.Name</a>
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="task_desc_0">@ticket6.Description</p>
+                                                            </td>
+                                                            <td>
+                                                                <a class="me-2" data-bs-toggle="tooltip"
+                                                                   data-bs-placement="top" title="Edit"
+                                                                   asp-action="Edit" asp-controller="Tickets">
+                                                                    <i data-feather="link"></i>
+                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                       asp-controller="Tickets"
+                                                                       asp-route-id="@ticket6.Id">
+                                                                    <i data-feather="more-horizontal"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="bs-tooltip"
+                                                                   title="Archive"><i data-feather="trash-2"></i></a>
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="Defect" role="tabpanel" aria-labelledby="pills-tasks-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">DEFECT TICKETS</h6>
+                                        </div>
+                                        <div class="taskadd">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    @foreach (Ticket ticket7 in Model.Tickets.Where(t => t.TicketType.Name == "Defect"))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a asp-action="Details" asp-controller="Tickets"
+                                                                   asp-route-id="@ticket7.Id">
+                                                                    <h5 class="task_title_0">@ticket7.Title</h5>
+                                                                </a>
+                                                                <p class="project_name_0">
+                                                                    <a>@ticket7.TicketStatus.Name</a>
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="task_desc_0">@ticket7.Description</p>
+                                                            </td>
+                                                            <td>
+                                                                <a class="me-2" data-bs-toggle="tooltip"
+                                                                   data-bs-placement="top" title="Edit"
+                                                                   asp-action="Edit" asp-controller="Tickets">
+                                                                    <i data-feather="link"></i>
+                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                       asp-controller="Tickets"
+                                                                       asp-route-id="@ticket7.Id">
+                                                                    <i data-feather="more-horizontal"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="bs-tooltip"
+                                                                   title="Archive"><i data-feather="trash-2"></i></a>
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="WorkTask" role="tabpanel" aria-labelledby="pills-notification-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">WORK TASK TICKETS</h6>
+                                        </div>
+                                        <div class="taskadd">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    @foreach (Ticket ticket7 in Model.Tickets.Where(t => t.TicketType.Name == "WorkTask"))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a asp-action="Details" asp-controller="Tickets"
+                                                                   asp-route-id="@ticket7.Id">
+                                                                    <h5 class="task_title_0">@ticket7.Title</h5>
+                                                                </a>
+                                                                <p class="project_name_0">
+                                                                    <a>@ticket7.TicketStatus.Name</a>
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="task_desc_0">@ticket7.Description</p>
+                                                            </td>
+                                                            <td>
+                                                                <a class="me-2" data-bs-toggle="tooltip"
+                                                                   data-bs-placement="top" title="Edit"
+                                                                   asp-action="Edit" asp-controller="Tickets">
+                                                                    <i data-feather="link"></i>
+                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                       asp-controller="Tickets"
+                                                                       asp-route-id="@ticket7.Id">
+                                                                    <i data-feather="more-horizontal"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="bs-tooltip"
+                                                                   title="Archive"><i data-feather="trash-2"></i></a>
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="NewDevelopment" role="tabpanel" aria-labelledby="pills-newsletter-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">NEW DEVELOPMENT</h6>
+                                        </div>
+                                        <div class="taskadd">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    @foreach (Ticket ticket8 in Model.Tickets.Where(t => t.TicketType.Name == "NewDevelopment"))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a asp-action="Details" asp-controller="Tickets"
+                                                                   asp-route-id="@ticket8.Id">
+                                                                    <h5 class="task_title_0">@ticket8.Title</h5>
+                                                                </a>
+                                                                <p class="project_name_0">
+                                                                    <a>@ticket8.TicketStatus.Name</a>
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="task_desc_0">@ticket8.Description</p>
+                                                            </td>
+                                                            <td>
+                                                                <a class="me-2" data-bs-toggle="tooltip"
+                                                                   data-bs-placement="top" title="Edit"
+                                                                   asp-action="Edit" asp-controller="Tickets">
+                                                                    <i data-feather="link"></i>
+                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                       asp-controller="Tickets"
+                                                                       asp-route-id="@ticket8.Id">
+                                                                    <i data-feather="more-horizontal"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="bs-tooltip"
+                                                                   title="Archive"><i data-feather="trash-2"></i></a>
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="GeneralTask" role="tabpanel" aria-labelledby="pills-newsletter-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h6 class="mb-0">GENERAL TASK TICKETS</h6>
+                                        </div>
+                                        <div class="taskadd">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    @foreach (Ticket ticket9 in Model.Tickets.Where(t => t.TicketType.Name == "GeneralTask"))
+                                                    {
+                                                        <tr>
+                                                            <td>
+                                                                <a asp-action="Details" asp-controller="Tickets"
+                                                                   asp-route-id="@ticket9.Id">
+                                                                    <h5 class="task_title_0">@ticket9.Title</h5>
+                                                                </a>
+                                                                <p class="project_name_0">
+                                                                    <a>@ticket9.TicketStatus.Name</a>
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="task_desc_0">@ticket9.Description</p>
+                                                            </td>
+                                                            <td>
+                                                                <a class="me-2" data-bs-toggle="tooltip"
+                                                                   data-bs-placement="top" title="Edit"
+                                                                   asp-action="Edit" asp-controller="Tickets">
+                                                                    <i data-feather="link"></i>
+                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                       asp-controller="Tickets"
+                                                                       asp-route-id="@ticket9.Id">
+                                                                    <i data-feather="more-horizontal"></i>
+                                                                </a>
+                                                                <a href="javascript:void(0)" class="bs-tooltip"
+                                                                   title="Archive"><i data-feather="trash-2"></i></a>
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal fade modal-bookmark" id="" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Create Tag</h5>
+                                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close">                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="form-bookmark needs-validation" novalidate="">
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-12">
+                                                            <label>Tag Name</label>
+                                                            <input class="form-control" type="text" required="" autocomplete="off">
+                                                        </div>
+                                                        <div class="form-group col-md-12 mb-0">
+                                                            <label>Tag color</label>
+                                                            <input class="form-control fill-color" type="color" value="#24695c">
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-secondary" type="button">Save</button>
+                                                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

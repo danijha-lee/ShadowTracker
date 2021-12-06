@@ -69,7 +69,14 @@
                                 @*Ticket date*@
                                 <li><strong>Date Entered:</strong> <span class=""> @Model.Created.ToString("dd/MM/yy")</span></li>
                                 @*Project end date*@
-                                <li><strong>Deadline:</strong> <span class="">@Model.DueDate.Value.ToString("dd/MM/yy") </span></li>
+                                @if (Model.DueDate is not null)
+                                {
+                                    <li><strong>Deadline:</strong> <span class="">@Model.DueDate.Value.ToString("dd/MM/yy") </span></li>
+                                }
+                                else
+                                {
+                                    <li><strong>Deadline:</strong> <span class=""> No Due Date Set</span></li>
+                                }
                                 @*Ticket type*@
                                 <li><strong>Type:</strong> <span class=""> @Model.TicketType.Name</span></li>
                                 @*Ticket priority*@

@@ -52,7 +52,23 @@ namespace ShadowTracker.Controllers
         public async Task<IActionResult> AllTickets()
         {
             int companyId = User.Identity.GetCompanyId().Value;
-            List<Ticket> model = await _ticketService.GetAllTicketsByCompanyAsync(companyId);
+            TicketFilterViewModel model = new();
+
+            model.Tickets = await _ticketService.GetAllTicketsByCompanyAsync(companyId);
+            model.TicketPrioritySelectList = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
+            model.TicketTypeSelectList = new SelectList(await _lookupService.GetTicketTypesAsync(), "Id", "Name");
+
+            string userId = _userManager.GetUserId(User);
+
+            if (User.IsInRole(nameof(BTRoles.Admin)))
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
+            }
+            else
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(userId), "Id", "Name");
+            }
+
             return View(model);
         }
 
@@ -61,7 +77,21 @@ namespace ShadowTracker.Controllers
         {
             string userId = _userManager.GetUserId(User);
             int companyId = User.Identity.GetCompanyId().Value;
-            List<Ticket> model = await _ticketService.GetTicketsByUserIdAsync(userId, companyId);
+
+            TicketFilterViewModel model = new();
+
+            model.Tickets = await _ticketService.GetTicketsByUserIdAsync(userId, companyId);
+            model.TicketPrioritySelectList = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
+            model.TicketTypeSelectList = new SelectList(await _lookupService.GetTicketTypesAsync(), "Id", "Name");
+
+            if (User.IsInRole(nameof(BTRoles.Admin)))
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
+            }
+            else
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(userId), "Id", "Name");
+            }
 
             return View(model);
         }
@@ -203,14 +233,7 @@ namespace ShadowTracker.Controllers
                 }
                 return RedirectToAction(nameof(AllTickets));
             }
-            if (User.IsInRole(nameof(BTRoles.Admin)))
-            {
-                ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
-            }
-            else
-            {
-                ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(userId), "Id", "Name");
-            }
+
             return View(ticket);
         }
 

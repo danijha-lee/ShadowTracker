@@ -153,6 +153,7 @@ namespace ShadowTracker.Services
                                                         .Include(t => t.TicketStatus)
                                                         .Include(t => t.TicketType)
                                                         .Include(t => t.Project)
+                                                        .OrderByDescending(t => t.Created)
                                                      .ToListAsync();
 
                 return tickets;
@@ -596,6 +597,39 @@ namespace ShadowTracker.Services
             {
                 _context.Update(ticket);
                 await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<TicketComment>> GetTicketCommentsAsync(int ticketId)
+        {
+            try
+            {
+                List<TicketComment> ticketComments = await _context.TicketComments.Where(c => c.TicketId == ticketId).ToListAsync();
+                return ticketComments;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<int> GetProjectCommentCountAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects.Include(p => p.Tickets).ThenInclude(t => t.Comments).FirstOrDefaultAsync(p => p.Id == projectId);
+                int count = 0;
+
+                foreach (var ticket in project.Tickets)
+                {
+                    count += ticket.Comments.Count;
+                }
+
+                return count;
             }
             catch (Exception)
             {
