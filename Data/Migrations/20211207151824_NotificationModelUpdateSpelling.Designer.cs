@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShadowTracker.Data;
@@ -9,9 +10,10 @@ using ShadowTracker.Data;
 namespace ShadowTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211207151824_NotificationModelUpdateSpelling")]
+    partial class NotificationModelUpdateSpelling
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -348,7 +350,7 @@ namespace ShadowTracker.Data.Migrations
                     b.Property<string>("Message")
                         .HasColumnType("text");
 
-                    b.Property<int>("NotificationTypeId")
+                    b.Property<int?>("NotificationTypeId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("ProjectId")
@@ -833,9 +835,7 @@ namespace ShadowTracker.Data.Migrations
                 {
                     b.HasOne("ShadowTracker.Models.NotificationType", "NotificationType")
                         .WithMany()
-                        .HasForeignKey("NotificationTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NotificationTypeId");
 
                     b.HasOne("ShadowTracker.Models.Project", "Project")
                         .WithMany("Notifications")

@@ -15,5 +15,7 @@ namespace ShadowTracker.Services.Interfaces
         public Task<List<TicketType>> GetTicketTypesAsync();
 
         public Task<List<ProjectPriority>> GetProjectPrioritiesAsync();
+
+        public Task<int?> LookupNotificationTypeId(string typeName);
     }
 }

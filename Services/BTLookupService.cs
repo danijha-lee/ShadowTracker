@@ -88,7 +88,19 @@ namespace ShadowTracker.Services
             }
         }
 
-        #endregion Get Ticket Types
+        public async Task<int?> LookupNotificationTypeId(string typeName)
+        {
+            try
+            {
+                NotificationType notificationType = await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == typeName);
+                return notificationType.Id;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
+        #endregion Get Ticket Types
     }
 }

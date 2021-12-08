@@ -52,6 +52,7 @@ namespace ShadowTracker
             services.AddScoped<IBTTicketHistoryService, BTTicketHistoryService>();
             services.AddScoped<IBTInviteService, BTInviteService>();
             services.AddScoped<IEmailSender, BTEmailService>();
+            services.AddScoped<IBTNotificationService, BTNotificationService>();
 
             services.Configure<MailSettings>(Configuration.GetSection("MailSettings"));
             services.AddControllersWithViews();

@@ -1,90 +1,256 @@
 ﻿@model IEnumerable<ShadowTracker.Models.Project>
-
+@using ShadowTracker.Models.Enums
+@using Microsoft.AspNetCore.Identity
+@using ShadowTracker.Services.Interfaces
+@using ShadowTracker.Extensions
+@inject UserManager<BTUser> _userManager
+@inject IBTProjectService _projectService
+@inject IBTTicketService _ticketService
+@inject IImageService _imageService
+@inject IBTCompanyInfoService _companyInfoService
 @{
     ViewData["Title"] = "Archived Projects";
+    int companyId = User.Identity.GetCompanyId().Value;
+    Company company = await _companyInfoService.GetCompanyInfoByIdAsync(companyId);
+    BTUser user = await _userManager.GetUserAsync(User);
+    int count = (await _projectService.GetArchivedProjectsByCompanyAsync(companyId)).Count;
 }
 
-<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageFileName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageFileData)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageContentType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Archived)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProjectPriority)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Description)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EndDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ImageFileName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ImageFileData)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ImageContentType)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Archived)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Company.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProjectPriority.Id)
-                </td>
-                <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
+
+<!-- Container-fluid starts-->
+<div class="container-fluid">
+    <div class="row project-cards">
+        <div class="col-md-12 project-list">
+            <div class="card">
+                <div class="row">
+                    <div class="col-md-6 p-0">
+                        <ul class="nav nav-tabs border-tab" id="top-tab" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" id="top-home-tab" data-bs-toggle="tab" href="#top-home" role="tab" aria-controls="top-home" aria-selected="true"><i data-feather="target"></i>Archived Projects</a></li>
+
+                        </ul>
+                    </div>
+                    @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+                    {
+                        <div class="col-md-6 p-0">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal"> <i data-feather="plus-square"> </i>Create New Project</a>
+                        </div>
+                    }
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="tab-content" id="top-tabContent">
+                        <div class="tab-pane fade show active" id="top-home" role="tabpanel" aria-labelledby="top-home-tab">
+                            <div class="row">
+                                @if (count == 0)
+                                {
+                                   
+                                        
+                                            <h6 class="text-center">No Projects Yet</h6>
+                                }
+                                else
+                                {
+                                    @foreach (Project project in Model)
+                                    {
+                                        BTUser projectManager = await _projectService.GetProjectManagerAsync(project.Id);
+
+                                        <div class="col-xxl-4 col-lg-6">
+                                            <div class="project-box">
+                                                @if (project.ProjectPriority?.Name == (nameof(BTProjectPriority.Urgent)))
+                                                {
+                                                    <span class="badge badge-danger">@project.ProjectPriority.Name</span>
+                                                }
+                                                @if (project.ProjectPriority?.Name == (nameof(BTProjectPriority.High)))
+                                                {
+                                                    <span class="badge badge-secondary">@project.ProjectPriority.Name</span>
+                                                }
+                                                @if (project.ProjectPriority?.Name == (nameof(BTProjectPriority.Medium)))
+                                                {
+                                                    <span class="badge badge-warning">@project.ProjectPriority.Name</span>
+                                                }
+                                                else if (project.ProjectPriority?.Name == (nameof(BTProjectPriority.Low)))
+                                                {
+                                                    <span class="badge badge-success">@project.ProjectPriority.Name</span>
+                                                }
+
+                                                <h6><a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id">@project.Name</a></h6>
+                                                <div class="media">
+                                                    @if (projectManager != null && projectManager.AvatarFormFile != null)
+                                                    {
+                                                        <img class="img-20 me-2 rounded-circle" src="@_imageService.DecodeImage(projectManager.AvatarFileData, projectManager.AvatarContentType)" alt="" data-original-title="" title="">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img class="img-20 me-2 rounded-circle" src="../assets/images/user/3.jpg" alt="" data-original-title="" title="">
+                                                    }
+                                                    <div class="media-body">
+                                                        <p>@projectManager?.FullName : Project Manager</p>
+                                                    </div>
+                                                </div>
+                                                <p></p>
+                                                <div class="row details">
+                                                    <div class="col-6"><span> Issues</span></div>
+                                                    <div class="col-6 font-primary">@project.Tickets.Count </div>
+                                                    <div class="col-6"> <span>Resolved</span></div>
+                                                    <div class="col-6 font-primary">@project.Tickets.Where(t => t.TicketStatus.Name == "Resolved").Count()</div>
+                                                    <div class="col-6"> <span>Comments</span></div>
+                                                    <div class="col-6 font-primary">@(await _ticketService.GetProjectCommentCountAsync(project.Id))</div>
+                                                </div>
+                                                <div class="customers">
+                                                    <ul>
+                                                        <li class="d-inline-block"><img class="img-30 rounded-circle" src="../assets/images/user/3.jpg" alt="" data-original-title="" title=""></li>
+                                                        <li class="d-inline-block"><img class="img-30 rounded-circle" src="../assets/images/user/5.jpg" alt="" data-original-title="" title=""></li>
+                                                        <li class="d-inline-block"><img class="img-30 rounded-circle" src="../assets/images/user/1.jpg" alt="" data-original-title="" title=""></li>
+                                                        <li class="d-inline-block ms-2">
+                                                            <p class="f-12">+10 More</p>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="project-status mt-4">
+                                                    @{
+                                                        var start = project.StartDate.Value;
+                                                        var end = project.EndDate.Value;
+                                                        var today = DateTime.Now;
+                                                        var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+                                                    }
+                                                    <div class="media mb-0">
+                                                        <p>@percent% </p>
+                                                        <div class="media-body text-end"><span>Done</span></div>
+                                                    </div>
+                                                    <div class="progress" style="height: 5px">
+                                                        <div class="progress-bar-animated bg-primary progress-bar-striped" role="progressbar" style="width: @percent%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Container-fluid Ends-->
+
+<div class="modal fade modal-bookmark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add New Project</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close">                                                 </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-bookmark needs-validation" id="bookmark-form" asp-action="Create" asp-controller="Projects" method="post">
+                    <input hidden name="Created" />
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger"></div>
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="form theme-form">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="mb-3">
+                                                <label>Project Title</label>
+                                                <input class="form-control" name="Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="mb-3">
+                                                <label>Company Name</label>
+                                                <input class="form-control disabled" disabled placeholder="@company.Name">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label>Project Manager</label>
+                                            <select class="form-select" asp-items="ViewBag.ProjectManager">
+                                                <option>Choose...</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label>Priority</label>
+                                            <select class="form-select" asp-items="ViewBag.ProjectPriority">
+                                                <option>Choose..</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label>Start Date</label>
+                                            <input class="datepicker-here form-control" name="StartDate" type="date" data-language="en">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="mb-3">
+                                            <label>Ending date</label>
+                                            <input class="datepicker-here form-control" name="EndDate" type="date" data-language="en">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="mb-3">
+                                            <label>Enter Project Details</label>
+                                            <textarea class="form-control" id="editor1" cols="4" rows="10" name="Description"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="row">
+                                        <div class="col">
+                                            <div class="mb-3">
+                                                <label>Upload project file</label>
+                                                <form class="dropzone" id="singleFileUpload" action="/upload.php">
+                                                    <div class="dz-message needsclick">
+                                                        <i class="icon-cloud-up"></i>
+                                                        <h6>Drop files here or click to upload.</h6><span class="note needsclick">(This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.)</span>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="text-end"><a class="btn btn-secondary me-3" href="#">Add</a><a class="btn btn-danger" href="#">Cancel</a></div>
+                                        </div>*@
+                                <button class="btn btn-secondary" @*id="Bookmark"
+                                                                    onclick="submitBookMark()" *@
+                                        type="submit">
+                                    Save
+                                </button>
+                                <button class="btn btn-primary" type="button"
+                                        data-bs-dismiss="modal">
+                                    Cancel
+                                </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>

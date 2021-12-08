@@ -7,22 +7,29 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShadowTracker.Data;
 using ShadowTracker.Models;
+using ShadowTracker.Services.Interfaces;
+using ShadowTracker.Extensions;
 
 namespace ShadowTracker.Controllers
 {
     public class CompaniesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IBTCompanyInfoService _companyInforService;
 
-        public CompaniesController(ApplicationDbContext context)
+        public CompaniesController(ApplicationDbContext context,
+                                    IBTCompanyInfoService companyInforService)
         {
             _context = context;
+            _companyInforService = companyInforService;
         }
 
         // GET: Companies
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Companies.ToListAsync());
+            int companyId = User.Identity.GetCompanyId().Value;
+            Company company = await _companyInforService.GetCompanyInfoByIdAsync(companyId);
+            return View(company);
         }
 
         // GET: Companies/Details/5

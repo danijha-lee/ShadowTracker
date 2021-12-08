@@ -1,15 +1,22 @@
 ﻿@model ShadowTracker.Models.ViewModels.TicketFilterViewModel
 @using Microsoft.AspNetCore.Identity
 @using ShadowTracker.Services.Interfaces
-@using ShadowTracker.Models.Enums 
+@using ShadowTracker.Models.Enums
+@using ShadowTracker.Extensions
+@inject IBTCompanyInfoService _companyInfoService
+
 @inject IBTTicketService _ticketService
 @inject IBTProjectService _projectService
 @inject UserManager<BTUser> _userManager
 @inject IBTLookupService _lookupService
 
+
 @{
     ViewData["Title"] = "All Tickets";
     BTUser user = await _userManager.GetUserAsync(User);
+    int companyId = User.Identity.GetCompanyId().Value;
+    Company company = await _companyInfoService.GetCompanyInfoByIdAsync(companyId);
+
 }
 
 
@@ -33,7 +40,7 @@
                                     </div>
                                     <ul class="nav main-menu" role="tablist">
                                         <li class="nav-item">
-                                            <button class="badge-light btn-block btn-mail" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="me-2" data-feather="check-circle"></i>New Task</button>
+                                            <button class="badge-light btn-block btn-mail" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="me-2" data-feather="check-circle"></i>Add New Ticket</button>
                                             <div class="modal fade modal-bookmark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                                 <div class="modal-dialog modal-lg" role="document">
                                                     <div class="modal-content">
@@ -112,7 +119,7 @@
                                         <li>
                                             <hr>
                                         </li>
-                                        <li><span class="main-title"> Type<span class="pull-right"><a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#createtag"><i data-feather="plus-circle"></i></a></span></span></li>
+                                        <li><span class="main-title"> Type</span></li>
                                         <li><a class="show" id="pills-monthly-tab" data-bs-toggle="pill" href="#Enhancement" role="tab" aria-controls="pills-monthly" aria-selected="false"><span class="title">Enhancement</span></a></li>
                                         <li><a class="show" id="pills-assigned-tab" data-bs-toggle="pill" href="#ChangeRequest" role="tab" aria-controls="pills-assigned" aria-selected="false"><span class="title">Change Request</span></a></li>
                                         <li><a class="show" id="pills-tasks-tab" data-bs-toggle="pill" href="#Defect" role="tab" aria-controls="pills-tasks" aria-selected="false"><span class="title">Defect</span></a></li>
@@ -148,6 +155,7 @@
                                                                     <div class="no-favourite"><span>No Tickets Yet.</span></div>
                                                                 </div>
                                                             </div>
+
                                                         }
                                                         else
                                                         {
@@ -184,7 +192,7 @@
                                                             }
                                                         }
 
-                                                        </table>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
@@ -210,37 +218,37 @@
                                                         }
                                                         else
                                                         {
-                                                        @foreach (Ticket ticket1 in Model.Tickets.Where(t => t.TicketPriority.Name == "Urgent"))
-                                                        {
-                                                            <tr>
-                                                                <td>
-                                                                    <a asp-action="Details" asp-controller="Tickets"
-                                                                       asp-route-id="@ticket1.Id">
-                                                                        <h5 class="task_title_0">@ticket1.Title</h5>
-                                                                    </a>
-                                                                    <p class="project_name_0">
-                                                                        <a>@ticket1.TicketStatus.Name</a>
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p class="task_desc_0">@ticket1.Description</p>
-                                                                </td>
-                                                                <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                           asp-controller="Tickets"
+                                                            @foreach (Ticket ticket1 in Model.Tickets.Where(t => t.TicketPriority.Name == "Urgent"))
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <a asp-action="Details" asp-controller="Tickets"
                                                                            asp-route-id="@ticket1.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
+                                                                            <h5 class="task_title_0">@ticket1.Title</h5>
+                                                                        </a>
+                                                                        <p class="project_name_0">
+                                                                            <a>@ticket1.TicketStatus.Name</a>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p class="task_desc_0">@ticket1.Description</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="me-2" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets">
+                                                                            <i data-feather="link"></i>
+                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket1.Id">
+                                                                            <i data-feather="more-horizontal"></i>
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="trash-2"></i></a>
+                                                                    </td>
 
-                                                            </tr>
-                                                        }
+                                                                </tr>
+                                                            }
                                                         }
                                                     </table>
                                                 </div>
@@ -257,36 +265,48 @@
                                             <div class="taskadd">
                                                 <div class="table-responsive">
                                                     <table class="table">
-                                                        @foreach (Ticket ticket2 in Model.Tickets.Where(t => t.TicketPriority.Name == "High"))
+                                                        @if (Model.Tickets.Where(t => t.TicketPriority.Name == "High").Count() == 0)
                                                         {
-                                                            <tr>
-                                                                <td>
-                                                                    <a asp-action="Details" asp-controller="Tickets"
-                                                                       asp-route-id="@ticket2.Id">
-                                                                        <h5 class="task_title_0">@ticket2.Title</h5>
-                                                                    </a>
-                                                                    <p class="project_name_0">
-                                                                        <a>@ticket2.TicketStatus.Name</a>
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p class="task_desc_0">@ticket2.Description</p>
-                                                                </td>
-                                                                <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                           asp-controller="Tickets"
+                                                            <div class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            @foreach (Ticket ticket2 in Model.Tickets.Where(t => t.TicketPriority.Name == "High"))
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <a asp-action="Details" asp-controller="Tickets"
                                                                            asp-route-id="@ticket2.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
-                                                                
-                                                            </tr>
+                                                                            <h5 class="task_title_0">@ticket2.Title</h5>
+                                                                        </a>
+                                                                        <p class="project_name_0">
+                                                                            <a>@ticket2.TicketStatus.Name</a>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p class="task_desc_0">@ticket2.Description</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="me-2" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets">
+                                                                            <i data-feather="link"></i>
+                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket2.Id">
+                                                                            <i data-feather="more-horizontal"></i>
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="trash-2"></i></a>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
                                                         }
                                                     </table>
                                                 </div>
@@ -303,36 +323,48 @@
                                             <div class="taskadd">
                                                 <div class="table-responsive">
                                                     <table class="table">
-                                                        @foreach (Ticket ticket3 in Model.Tickets.Where(t => t.TicketPriority.Name == "Medium"))
+                                                        @if (Model.Tickets.Where(t => t.TicketPriority.Name == "Medium").Count() == 0)
                                                         {
-                                                            <tr>
-                                                                <td>
-                                                                    <a asp-action="Details" asp-controller="Tickets"
-                                                                       asp-route-id="@ticket3.Id">
-                                                                        <h5 class="task_title_0">@ticket3.Title</h5>
-                                                                    </a>
-                                                                    <p class="project_name_0">
-                                                                        <a>@ticket3.TicketStatus.Name</a>
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p class="task_desc_0">@ticket3.Description</p>
-                                                                </td>
-                                                                <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                           asp-controller="Tickets"
+                                                            <div class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            @foreach (Ticket ticket3 in Model.Tickets.Where(t => t.TicketPriority.Name == "Medium"))
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <a asp-action="Details" asp-controller="Tickets"
                                                                            asp-route-id="@ticket3.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
-                                                                
-                                                            </tr>
+                                                                            <h5 class="task_title_0">@ticket3.Title</h5>
+                                                                        </a>
+                                                                        <p class="project_name_0">
+                                                                            <a>@ticket3.TicketStatus.Name</a>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p class="task_desc_0">@ticket3.Description</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="me-2" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets">
+                                                                            <i data-feather="link"></i>
+                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket3.Id">
+                                                                            <i data-feather="more-horizontal"></i>
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="trash-2"></i></a>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
                                                         }
                                                     </table>
                                                 </div>
@@ -349,36 +381,48 @@
                                             <div class="taskadd">
                                                 <div class="table-responsive">
                                                     <table class="table">
-                                                        @foreach (Ticket ticket4 in Model.Tickets.Where(t => t.TicketPriority.Name == "Low"))
+                                                        @if (Model.Tickets.Where(t => t.TicketPriority.Name == "Low").Count() == 0)
                                                         {
-                                                            <tr>
-                                                                <td>
-                                                                    <a asp-action="Details" asp-controller="Tickets"
-                                                                       asp-route-id="@ticket4.Id">
-                                                                        <h5 class="task_title_0">@ticket4.Title</h5>
-                                                                    </a>
-                                                                    <p class="project_name_0">
-                                                                        <a>@ticket4.TicketStatus.Name</a>
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p class="task_desc_0">@ticket4.Description</p>
-                                                                </td>
-                                                                <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                           asp-controller="Tickets"
+                                                            <div class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            @foreach (Ticket ticket4 in Model.Tickets.Where(t => t.TicketPriority.Name == "Low"))
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <a asp-action="Details" asp-controller="Tickets"
                                                                            asp-route-id="@ticket4.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
-                                                                
-                                                            </tr>
+                                                                            <h5 class="task_title_0">@ticket4.Title</h5>
+                                                                        </a>
+                                                                        <p class="project_name_0">
+                                                                            <a>@ticket4.TicketStatus.Name</a>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p class="task_desc_0">@ticket4.Description</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="me-2" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets">
+                                                                            <i data-feather="link"></i>
+                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket4.Id">
+                                                                            <i data-feather="more-horizontal"></i>
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="trash-2"></i></a>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
                                                         }
                                                     </table>
                                                 </div>
@@ -395,36 +439,48 @@
                                             <div class="taskadd">
                                                 <div class="table-responsive">
                                                     <table class="table">
-                                                        @foreach (Ticket ticket5 in Model.Tickets.Where(t => t.TicketType.Name == "Enhancement"))
+                                                        @if (Model.Tickets.Where(t => t.TicketType.Name == "Enhancement").Count() == 0)
                                                         {
-                                                            <tr>
-                                                                <td>
-                                                                    <a asp-action="Details" asp-controller="Tickets"
-                                                                       asp-route-id="@ticket5.Id">
-                                                                        <h5 class="task_title_0">@ticket5.Title</h5>
-                                                                    </a>
-                                                                    <p class="project_name_0">
-                                                                        <a>@ticket5.TicketStatus.Name</a>
-                                                                    </p>
-                                                                </td>
-                                                                <td>
-                                                                    <p class="task_desc_0">@ticket5.Description</p>
-                                                                </td>
-                                                                <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                           asp-controller="Tickets"
+                                                            <div class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            @foreach (Ticket ticket5 in Model.Tickets.Where(t => t.TicketType.Name == "Enhancement"))
+                                                            {
+                                                                <tr>
+                                                                    <td>
+                                                                        <a asp-action="Details" asp-controller="Tickets"
                                                                            asp-route-id="@ticket5.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
-                                                               
-                                                            </tr>
+                                                                            <h5 class="task_title_0">@ticket5.Title</h5>
+                                                                        </a>
+                                                                        <p class="project_name_0">
+                                                                            <a>@ticket5.TicketStatus.Name</a>
+                                                                        </p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <p class="task_desc_0">@ticket5.Description</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a class="me-2" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets">
+                                                                            <i data-feather="link"></i>
+                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket5.Id">
+                                                                            <i data-feather="more-horizontal"></i>
+                                                                        </a>
+                                                                        <a href="javascript:void(0)" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="trash-2"></i></a>
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
                                                         }
                                                     </table>
                                                 </div>
@@ -440,36 +496,48 @@
                                         <div class="taskadd">
                                             <div class="table-responsive">
                                                 <table class="table">
-                                                    @foreach (Ticket ticket6 in Model.Tickets.Where(t => t.TicketType.Name == "ChangeRequest"))
+                                                    @if (Model.Tickets.Where(t => t.TicketType.Name == "ChangeRequest").Count() == 0)
                                                     {
-                                                        <tr>
-                                                            <td>
-                                                                <a asp-action="Details" asp-controller="Tickets"
-                                                                   asp-route-id="@ticket6.Id">
-                                                                    <h5 class="task_title_0">@ticket6.Title</h5>
-                                                                </a>
-                                                                <p class="project_name_0">
-                                                                    <a>@ticket6.TicketStatus.Name</a>
-                                                                </p>
-                                                            </td>
-                                                            <td>
-                                                                <p class="task_desc_0">@ticket6.Description</p>
-                                                            </td>
-                                                            <td>
-                                                                <a class="me-2" data-bs-toggle="tooltip"
-                                                                   data-bs-placement="top" title="Edit"
-                                                                   asp-action="Edit" asp-controller="Tickets">
-                                                                    <i data-feather="link"></i>
-                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                       asp-controller="Tickets"
+                                                        <div class="card-body">
+                                                            <div class="details-bookmark text-center">
+                                                                <div class="row" id="favouriteData"></div>
+                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        @foreach (Ticket ticket6 in Model.Tickets.Where(t => t.TicketType.Name == "ChangeRequest"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
                                                                        asp-route-id="@ticket6.Id">
-                                                                    <i data-feather="more-horizontal"></i>
-                                                                </a>
-                                                                <a href="javascript:void(0)" class="bs-tooltip"
-                                                                   title="Archive"><i data-feather="trash-2"></i></a>
-                                                            </td>
+                                                                        <h5 class="task_title_0">@ticket6.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket6.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket6.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket6.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
 
-                                                        </tr>
+                                                            </tr>
+                                                        }
                                                     }
                                                 </table>
                                             </div>
@@ -484,36 +552,48 @@
                                         <div class="taskadd">
                                             <div class="table-responsive">
                                                 <table class="table">
-                                                    @foreach (Ticket ticket7 in Model.Tickets.Where(t => t.TicketType.Name == "Defect"))
+                                                    @if (Model.Tickets.Where(t => t.TicketType.Name == "Defect").Count() == 0)
                                                     {
-                                                        <tr>
-                                                            <td>
-                                                                <a asp-action="Details" asp-controller="Tickets"
-                                                                   asp-route-id="@ticket7.Id">
-                                                                    <h5 class="task_title_0">@ticket7.Title</h5>
-                                                                </a>
-                                                                <p class="project_name_0">
-                                                                    <a>@ticket7.TicketStatus.Name</a>
-                                                                </p>
-                                                            </td>
-                                                            <td>
-                                                                <p class="task_desc_0">@ticket7.Description</p>
-                                                            </td>
-                                                            <td>
-                                                                <a class="me-2" data-bs-toggle="tooltip"
-                                                                   data-bs-placement="top" title="Edit"
-                                                                   asp-action="Edit" asp-controller="Tickets">
-                                                                    <i data-feather="link"></i>
-                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                       asp-controller="Tickets"
+                                                        <div class="card-body">
+                                                            <div class="details-bookmark text-center">
+                                                                <div class="row" id="favouriteData"></div>
+                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        @foreach (Ticket ticket7 in Model.Tickets.Where(t => t.TicketType.Name == "Defect"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
                                                                        asp-route-id="@ticket7.Id">
-                                                                    <i data-feather="more-horizontal"></i>
-                                                                </a>
-                                                                <a href="javascript:void(0)" class="bs-tooltip"
-                                                                   title="Archive"><i data-feather="trash-2"></i></a>
-                                                            </td>
+                                                                        <h5 class="task_title_0">@ticket7.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket7.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket7.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket7.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
 
-                                                        </tr>
+                                                            </tr>
+                                                        }
                                                     }
                                                 </table>
                                             </div>
@@ -528,36 +608,48 @@
                                         <div class="taskadd">
                                             <div class="table-responsive">
                                                 <table class="table">
-                                                    @foreach (Ticket ticket7 in Model.Tickets.Where(t => t.TicketType.Name == "WorkTask"))
+                                                    @if (Model.Tickets.Where(t => t.TicketType.Name == "WorkTask").Count() == 0)
                                                     {
-                                                        <tr>
-                                                            <td>
-                                                                <a asp-action="Details" asp-controller="Tickets"
-                                                                   asp-route-id="@ticket7.Id">
-                                                                    <h5 class="task_title_0">@ticket7.Title</h5>
-                                                                </a>
-                                                                <p class="project_name_0">
-                                                                    <a>@ticket7.TicketStatus.Name</a>
-                                                                </p>
-                                                            </td>
-                                                            <td>
-                                                                <p class="task_desc_0">@ticket7.Description</p>
-                                                            </td>
-                                                            <td>
-                                                                <a class="me-2" data-bs-toggle="tooltip"
-                                                                   data-bs-placement="top" title="Edit"
-                                                                   asp-action="Edit" asp-controller="Tickets">
-                                                                    <i data-feather="link"></i>
-                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                       asp-controller="Tickets"
+                                                        <div class="card-body">
+                                                            <div class="details-bookmark text-center">
+                                                                <div class="row" id="favouriteData"></div>
+                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        @foreach (Ticket ticket7 in Model.Tickets.Where(t => t.TicketType.Name == "WorkTask"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
                                                                        asp-route-id="@ticket7.Id">
-                                                                    <i data-feather="more-horizontal"></i>
-                                                                </a>
-                                                                <a href="javascript:void(0)" class="bs-tooltip"
-                                                                   title="Archive"><i data-feather="trash-2"></i></a>
-                                                            </td>
+                                                                        <h5 class="task_title_0">@ticket7.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket7.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket7.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket7.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
 
-                                                        </tr>
+                                                            </tr>
+                                                        }
                                                     }
                                                 </table>
                                             </div>
@@ -572,36 +664,48 @@
                                         <div class="taskadd">
                                             <div class="table-responsive">
                                                 <table class="table">
-                                                    @foreach (Ticket ticket8 in Model.Tickets.Where(t => t.TicketType.Name == "NewDevelopment"))
+                                                    @if (Model.Tickets.Where(t => t.TicketType.Name == "NewDevelopment").Count() == 0)
                                                     {
-                                                        <tr>
-                                                            <td>
-                                                                <a asp-action="Details" asp-controller="Tickets"
-                                                                   asp-route-id="@ticket8.Id">
-                                                                    <h5 class="task_title_0">@ticket8.Title</h5>
-                                                                </a>
-                                                                <p class="project_name_0">
-                                                                    <a>@ticket8.TicketStatus.Name</a>
-                                                                </p>
-                                                            </td>
-                                                            <td>
-                                                                <p class="task_desc_0">@ticket8.Description</p>
-                                                            </td>
-                                                            <td>
-                                                                <a class="me-2" data-bs-toggle="tooltip"
-                                                                   data-bs-placement="top" title="Edit"
-                                                                   asp-action="Edit" asp-controller="Tickets">
-                                                                    <i data-feather="link"></i>
-                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                       asp-controller="Tickets"
+                                                        <div class="card-body">
+                                                            <div class="details-bookmark text-center">
+                                                                <div class="row" id="favouriteData"></div>
+                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        @foreach (Ticket ticket8 in Model.Tickets.Where(t => t.TicketType.Name == "NewDevelopment"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
                                                                        asp-route-id="@ticket8.Id">
-                                                                    <i data-feather="more-horizontal"></i>
-                                                                </a>
-                                                                <a href="javascript:void(0)" class="bs-tooltip"
-                                                                   title="Archive"><i data-feather="trash-2"></i></a>
-                                                            </td>
+                                                                        <h5 class="task_title_0">@ticket8.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket8.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket8.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket8.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
 
-                                                        </tr>
+                                                            </tr>
+                                                        }
                                                     }
                                                 </table>
                                             </div>
@@ -616,36 +720,48 @@
                                         <div class="taskadd">
                                             <div class="table-responsive">
                                                 <table class="table">
-                                                    @foreach (Ticket ticket9 in Model.Tickets.Where(t => t.TicketType.Name == "GeneralTask"))
+                                                    @if (Model.Tickets.Where(t => t.TicketType.Name == "GeneralTask").Count() == 0)
                                                     {
-                                                        <tr>
-                                                            <td>
-                                                                <a asp-action="Details" asp-controller="Tickets"
-                                                                   asp-route-id="@ticket9.Id">
-                                                                    <h5 class="task_title_0">@ticket9.Title</h5>
-                                                                </a>
-                                                                <p class="project_name_0">
-                                                                    <a>@ticket9.TicketStatus.Name</a>
-                                                                </p>
-                                                            </td>
-                                                            <td>
-                                                                <p class="task_desc_0">@ticket9.Description</p>
-                                                            </td>
-                                                            <td>
-                                                                <a class="me-2" data-bs-toggle="tooltip"
-                                                                   data-bs-placement="top" title="Edit"
-                                                                   asp-action="Edit" asp-controller="Tickets">
-                                                                    <i data-feather="link"></i>
-                                                                </a><a class="bs-tooltip" title="View" asp-action="Details"
-                                                                       asp-controller="Tickets"
+                                                        <div class="card-body">
+                                                            <div class="details-bookmark text-center">
+                                                                <div class="row" id="favouriteData"></div>
+                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        @foreach (Ticket ticket9 in Model.Tickets.Where(t => t.TicketType.Name == "GeneralTask"))
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <a asp-action="Details" asp-controller="Tickets"
                                                                        asp-route-id="@ticket9.Id">
-                                                                    <i data-feather="more-horizontal"></i>
-                                                                </a>
-                                                                <a href="javascript:void(0)" class="bs-tooltip"
-                                                                   title="Archive"><i data-feather="trash-2"></i></a>
-                                                            </td>
+                                                                        <h5 class="task_title_0">@ticket9.Title</h5>
+                                                                    </a>
+                                                                    <p class="project_name_0">
+                                                                        <a>@ticket9.TicketStatus.Name</a>
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="task_desc_0">@ticket9.Description</p>
+                                                                </td>
+                                                                <td>
+                                                                    <a class="me-2" data-bs-toggle="tooltip"
+                                                                       data-bs-placement="top" title="Edit"
+                                                                       asp-action="Edit" asp-controller="Tickets">
+                                                                        <i data-feather="link"></i>
+                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket9.Id">
+                                                                        <i data-feather="more-horizontal"></i>
+                                                                    </a>
+                                                                    <a href="javascript:void(0)" class="bs-tooltip"
+                                                                       title="Archive"><i data-feather="trash-2"></i></a>
+                                                                </td>
 
-                                                        </tr>
+                                                            </tr>
+                                                        }
                                                     }
                                                 </table>
                                             </div>
@@ -684,3 +800,6 @@
                 </div>
             </div>
         </div>
+
+    </div>
+</div>

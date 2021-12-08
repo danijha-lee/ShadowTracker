@@ -27,6 +27,7 @@ namespace ShadowTracker.Controllers
         private readonly IBTFileService _fileService;
         private readonly IBTRolesService _rolesService;
         private readonly IBTTicketHistoryService _ticketHistoryService;
+        private readonly IBTNotificationService _notificationService;
 
         public TicketsController(
                                 IBTTicketService ticketService,
@@ -36,7 +37,8 @@ namespace ShadowTracker.Controllers
                                 IBTCompanyInfoService companyInfoService,
                                 IBTFileService fileService,
                                 IBTRolesService rolesService,
-                                IBTTicketHistoryService ticketHistoryService)
+                                IBTTicketHistoryService ticketHistoryService,
+                                IBTNotificationService notificationService)
         {
             _ticketService = ticketService;
             _userManager = userManager;
@@ -46,6 +48,7 @@ namespace ShadowTracker.Controllers
             _fileService = fileService;
             _rolesService = rolesService;
             _ticketHistoryService = ticketHistoryService;
+            _notificationService = notificationService;
         }
 
         //GET: All Tickets
@@ -100,7 +103,18 @@ namespace ShadowTracker.Controllers
         public async Task<IActionResult> ArchivedTickets()
         {
             int companyId = User.Identity.GetCompanyId().Value;
+            BTUser user = await _userManager.GetUserAsync(User);
             List<Ticket> model = await _ticketService.GetArchivedTicketsAsync(companyId);
+            ViewData["TicketPriority"] = new SelectList(await _lookupService.GetTicketPrioritiesAsync(), "Id", "Name");
+            ViewData["TicketType"] = new SelectList(await _lookupService.GetTicketTypesAsync(), "Id", "Name");
+            if (User.IsInRole(nameof(BTRoles.Admin)))
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
+            }
+            else
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(user.Id), "Id", "Name");
+            }
 
             return View(model);
         }
@@ -215,6 +229,7 @@ namespace ShadowTracker.Controllers
         {
             string userId = _userManager.GetUserId(User);
             int companyId = User.Identity.GetCompanyId().Value;
+            BTUser btUser = await _userManager.GetUserAsync(User);
 
             if (ModelState.IsValid)
             {
@@ -226,12 +241,32 @@ namespace ShadowTracker.Controllers
                     await _ticketService.AddNewTicketAsync(ticket);
                     Ticket newTicket = await _ticketService.GetTicketAsNoTrackingAsync(ticket.Id);
                     await _ticketHistoryService.AddHistoryAsync(null, newTicket, userId);
+
+                    BTUser projectManager = await _projectService.GetProjectManagerAsync(ticket.ProjectId);
+                    Notification notification = new()
+                    {
+                        TicketId = ticket.Id,
+                        Title = "New Ticket Added",
+                        Message = $"New Ticket: {ticket.Title}, was created by {btUser.FullName} for the Project : {newTicket.Project.Name}",
+                        Created = DateTime.Now,
+                        SenderId = userId,
+                        RecipientId = projectManager?.Id,
+                    };
+                    await _notificationService.AddNotificationAsync(notification);
+                    if (projectManager != null)
+                    {
+                        await _notificationService.SendEmailNotificationAsync(notification, "New Ticket Added");
+                    }
+                    else
+                    {
+                        await _notificationService.SendEmailNotificationsByRoleAsync(notification, companyId, "Admin");
+                    }
                 }
                 catch (Exception)
                 {
                     throw;
                 }
-                return RedirectToAction(nameof(AllTickets));
+                return RedirectToAction("Details", "Projects", new { id = ticket.ProjectId });
             }
 
             return View(ticket);
@@ -323,6 +358,7 @@ namespace ShadowTracker.Controllers
         [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> AssignDeveloper(AssignDeveloperViewModel model)
         {
+            BTUser btUser = await _userManager.GetUserAsync(User);
             if (model.DeveloperId != null)
             {
                 string userId = _userManager.GetUserId(User);
@@ -338,6 +374,18 @@ namespace ShadowTracker.Controllers
 
                 Ticket newTicket = await _ticketService.GetTicketAsNoTrackingAsync(model.Ticket.Id);
                 await _ticketHistoryService.AddHistoryAsync(oldTicket, newTicket, userId);
+
+                Notification notification = new()
+                {
+                    TicketId = model.Ticket.Id,
+                    NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Ticket))).Value,
+                    Title = "Ticket Assigned",
+                    Message = $"Ticket : {model.Ticket.Title}, was assigned by {btUser.FullName}",
+                    SenderId = userId,
+                    RecipientId = model.Ticket.DeveloperUserId
+                };
+                await _notificationService.AddNotificationAsync(notification);
+                await _notificationService.SendEmailNotificationAsync(notification, "New Ticket Added");
                 return RedirectToAction(nameof(Details), new { id = model.Ticket.Id });
             }
             return RedirectToAction(nameof(AssignDeveloper), new { ticketId = model.Ticket.Id });

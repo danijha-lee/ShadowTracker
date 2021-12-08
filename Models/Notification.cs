@@ -17,6 +17,8 @@ namespace ShadowTracker.Models
         [DataType(DataType.Date)]
         public DateTime Created { get; set; }
 
+        public int NotificationTypeId { get; set; }
+
         [DisplayName("Had Been Viewed ")]
         public bool Viewed { get; set; }
 
@@ -27,7 +29,7 @@ namespace ShadowTracker.Models
         public int? ProjectId { get; set; }
 
         [DisplayName("Recipient")]
-        public string ReciepientId { get; set; }
+        public string RecipientId { get; set; }
 
         [Required]
         [DisplayName("Sender")]
