@@ -4,55 +4,55 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="form theme-form">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input hidden asp-for="CompanyToken" />
+                    <input hidden asp-for="CompanyId" />
+                    <input hidden asp-for="InvitorId" />
 
-<h4>Invite</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input hidden asp-for="CompanyToken" />
-            <input hidden asp-for="CompanyId" />
-            <input hidden asp-for="InvitorId" />
+                    <div class="form-group">
+                        <label asp-for="ProjectId" class="control-label"></label>
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                            <option>Choose...</option>
+                        </select>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="ProjectId" class="control-label"></label>
-                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
-            </div>
+                    <div class="form-group">
+                        <label asp-for="InviteeEmail" class="control-label"></label>
+                        <input asp-for="InviteeEmail" class="form-control" />
+                        <span asp-validation-for="InviteeEmail" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="InviteeFirstName" class="control-label"></label>
+                        <input asp-for="InviteeFirstName" class="form-control" />
+                        <span asp-validation-for="InviteeFirstName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="InviteeLastName" class="control-label"></label>
+                        <input asp-for="InviteeLastName" class="form-control" />
+                        <span asp-validation-for="InviteeLastName" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="InviteeEmail" class="control-label"></label>
-                <input asp-for="InviteeEmail" class="form-control" />
-                <span asp-validation-for="InviteeEmail" class="text-danger"></span>
+                    <div class="form-group border border-dark">
+                        <label asp-for="Message" class="control-label"></label>
+                        <textarea asp-for="Message"  id="editor1" name="editor1" cols="4" rows="10" class="form-control" ></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Send" class="btn btn-primary" />
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="InviteeFirstName" class="control-label"></label>
-                <input asp-for="InviteeFirstName" class="form-control" />
-                <span asp-validation-for="InviteeFirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="InviteeLastName" class="control-label"></label>
-                <input asp-for="InviteeLastName" class="form-control" />
-                <span asp-validation-for="InviteeLastName" class="text-danger"></span>
-            </div>
-
-            <div class="form-group">
-                <label asp-for="Message" class="control-label"></label>
-                <input asp-for="Message" class="form-control" />
-                <span asp-validation-for="Message" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+      
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+        @section Scripts {
+            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        }

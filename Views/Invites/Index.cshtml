@@ -1,101 +1,290 @@
 ﻿@model IEnumerable<ShadowTracker.Models.Invite>
+@using Microsoft.AspNetCore.Identity
+@using ShadowTracker.Services.Interfaces
+@using ShadowTracker.Models.Enums
+@using ShadowTracker.Extensions
+@inject IBTCompanyInfoService _companyInfoService
+
+@inject IBTTicketService _ticketService
+@inject IBTProjectService _projectService
+@inject UserManager<BTUser> _userManager
+@inject IBTLookupService _lookupService
+@inject IBTInviteService _inviteService
+@inject IBTTicketHistoryService _ticketHistoryService
 
 @{
-    ViewData["Title"] = "Index";
-}
+    ViewData["Title"] = "Invites Index";
+    BTUser user = await _userManager.GetUserAsync(User);
+    int companyId = User.Identity.GetCompanyId().Value;
+    Company company = await _companyInfoService.GetCompanyInfoByIdAsync(companyId);
+    List<Invite> pending = company.Invites.Where(i => i.IsValid == true).ToList();
+    List<Invite> accepeted = company.Invites.Where(i => i.IsValid == false).ToList();
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.InviteDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.JoinDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CompanyToken)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InviteeEmail)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InviteeFirstName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.InviteeLastName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsValid)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Message)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Invitor)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Invitee)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Project)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.InviteDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.JoinDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CompanyToken)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.InviteeEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.InviteeFirstName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.InviteeLastName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsValid)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Message)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Company.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Invitor.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Invitee.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Project.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
 }
-    </tbody>
-</table>
+<!-- Container-fluid starts-->
+<div class="container-fluid">
+    <div class="email-wrap bookmark-wrap">
+        <div class="row">
+            <div class="col-xl-3 xl-30">
+                <div class="email-sidebar">
+                    <a class="btn btn-primary email-aside-toggle" href="javascript:void(0)">contact filter    </a>
+                    <div class="email-left-aside">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="email-app-sidebar left-bookmark">
+                                    <div class="media">
+                                        <div class="media-size-email"><img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt=""></div>
+                                        <div class="media-body">
+                                            <a href="user-profile.html">
+                                                <h6 class="f-w-700">@user.FullName</h6>
+                                            </a>
+                                            <p>@user.Email</p>
+                                        </div>
+                                    </div>
+                                    <ul class="nav main-menu contact-options" role="tablist">
+                                        <li class="nav-item">
+                                            <button class="badge-light btn-block btn-mail w-100" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="me-2" data-feather="users"></i>Send New Invite</button>
+                                            <div class="modal fade modal-bookmark" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Company Invite</h5>
+                                                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form asp-action="Create" asp-controller="Invites" method="post">
+                                                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                                <input hidden name="CompanyToken" />
+                                                                <input hidden name="CompanyId" />
+                                                                <input hidden name="InvitorId" />
+
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Project</label>
+                                                                    <select name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                                                                        <option>Choose...</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Invitee's Email</label>
+                                                                    <input name="InviteeEmail" class="form-control" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Invitee's First Name</label>
+                                                                    <input name="InviteeFirstName" class="form-control" />
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="control-label">Invitee's Last Name</label>
+                                                                    <input name="InviteeLastName" class="form-control" />
+                                                                </div>
+
+                                                                <label class="control-label">Message</label>
+                                                                <div class="form-group border border-dark">
+                                                                    <textarea name="Message" id="editor1" cols="4" rows="10" class="form-control"></textarea>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <input type="submit" value="Send" class="btn btn-primary" />
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="nav-item"><span class="main-title"> Filter</span></li>
+                                        <li><a id="pills-personal-tab" data-bs-toggle="pill" href="#pills-personal" role="tab" aria-controls="pills-personal" aria-selected="true"><span class="title"> All Sent Invites</span></a></li>
+
+                                        <li><a class="show" id="pills-organization-tab" data-bs-toggle="pill" href="#pills-organization" role="tab" aria-controls="pills-organization" aria-selected="false"><span class="title">Pending Invites</span></a></li>
+                                        @*<li><a href="javascript:void(0)"><span class="title">Accepted Invites</span></a></li>*@
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-9 col-md-12 box-col-8 xl-70">
+                <div class="email-right-aside bookmark-tabcontent contacts-tabs">
+                    <div class="card email-body radius-left">
+                        <div class="ps-0">
+                            <div class="tab-content">
+                                <div class="tab-pane fade active show" id="pills-personal" role="tabpanel" aria-labelledby="pills-personal-tab">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h5>All Sent Invites</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="row list-persons" id="addcon">
+                                                @foreach (Invite invite in Model)
+                                                {
+                                                    <div class="col-xl-4 xl-50 col-md-5 box-col-6">
+                                                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                                            <a class="contact-tab-0 nav-link active" id="v-pills-user-tab" data-bs-toggle="pill" onclick="activeDiv(0)" href="#v-pills-user" role="tab" aria-controls="v-pills-user" aria-selected="true">
+                                                                <div class="media">
+                                                                    <img class="img-50 img-fluid m-r-20 rounded-circle update_img_0" src="../assets/images/user/2.png" alt="">
+                                                                    <div class="media-body">
+                                                                        <h6> <span class="first_name_0">@invite.InviteeFirstName </span><span class="last_name_0">@invite.InviteeLastName</span></h6>
+                                                                        <p class="email_add_0">@invite.InviteeEmail</p>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+
+                                                }
+                                                    <div class="col-xl-8 xl-50 col-md-7 box-col-6">
+                                                        <div class="tab-content" id="v-pills-tabContent">
+                                                            <div class="tab-pane contact-tab-0 tab-content-child fade show active" id="v-pills-user" role="tabpanel" aria-labelledby="v-pills-user-tab">
+                                                                <div class="profile-mail">
+                                                                    <div class="media align-items-center">
+                                                                        <img class="img-100 img-fluid m-r-20 rounded-circle update_img_0" src="../assets/images/user/2.png" alt="">
+                                                                        <input class="updateimg" type="file" name="img" onchange="readURL(this,0)">
+                                                                        <div class="media-body mt-0">
+                                                                            <h5><span class="first_name_0">Bucky </span><span class="last_name_0">Barnes</span></h5>
+                                                                            <p class="email_add_0">barnes@gmail.com</p>
+                                                                            <ul>
+
+                                                                                <li><a href="javascript:void(0)" onclick="history(0)">History</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="email-general">
+                                                                        <h6 class="mb-3">General</h6>
+                                                                        @*<ul>
+                                                                            <li>Name <span class="font-primary first_name_0">@invite.InviteeFirstName @invite.InviteeLastName</span></li>
+                                                                            <li>Date Sent <span class="font-primary first_name_0">@invite.InviteDate.ToString("dd MMM, yyyy")</span></li>
+                                                                            <li>Project<span class="font-primary personality_0">@invite.Project.Name</span></li>
+                                                                            <li>Invitor<span class="font-primary city_0">@invite.Invitor.FullName</span></li>
+                                                                            @if (invite.IsValid == true)
+                                                                            {
+                                                                                <li>Status<span class="font-primary mobile_num_0">Pending</span></li>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <li>Status<span class="font-primary mobile_num_0">Accepted</span></li>
+                                                                            }
+                                                                        </ul>*@
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fade tab-pane" id="pills-organization" role="tabpanel" aria-labelledby="pills-organization">
+                                    <div class="card mb-0">
+                                        <div class="card-header d-flex">
+                                            <h5>Pending Invites</h5><span class="f-14 pull-right mt-0"></span>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="row list-persons">
+                                                @foreach (Invite invite in pending)
+                                                {
+                                                    <div class="col-xl-4 xl-50 col-md-5 box-col-6">
+                                                        <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                                                            <a class="contact-tab-0 nav-link active" id="v-pills-user-tab" data-bs-toggle="pill" onclick="activeDiv(0)" href="#v-pills-user" role="tab" aria-controls="v-pills-user" aria-selected="true">
+                                                                <div class="media">
+                                                                    <img class="img-50 img-fluid m-r-20 rounded-circle update_img_0" src="../assets/images/user/2.png" alt="">
+                                                                    <div class="media-body">
+                                                                        <h6> <span class="first_name_0">@invite.InviteeFirstName </span><span class="last_name_0">@invite.InviteeLastName</span></h6>
+                                                                        <p class="email_add_0">@invite.InviteeEmail</p>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-xl-8 xl-50 col-md-7 box-col-6">
+                                                        <div class="tab-content" id="v-pills-tabContent">
+                                                            <div class="tab-pane contact-tab-0 tab-content-child fade show active" id="v-pills-user" role="tabpanel" aria-labelledby="v-pills-user-tab">
+                                                                <div class="profile-mail">
+                                                                    <div class="media align-items-center">
+                                                                        <img class="img-100 img-fluid m-r-20 rounded-circle update_img_0" src="../assets/images/user/2.png" alt="">
+                                                                        <input class="updateimg" type="file" name="img" onchange="readURL(this,0)">
+                                                                        <div class="media-body mt-0">
+                                                                            <h5><span class="first_name_0">Bucky </span><span class="last_name_0">Barnes</span></h5>
+                                                                            <p class="email_add_0">barnes@gmail.com</p>
+                                                                            <ul>
+
+                                                                                <li><a href="javascript:void(0)" onclick="history(0)">History</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="email-general">
+                                                                        <h6 class="mb-3">General</h6>
+                                                                        <ul>
+                                                                            <li>Name <span class="font-primary first_name_0">@invite.InviteeFirstName @invite.InviteeLastName</span></li>
+                                                                            <li>Date Sent <span class="font-primary first_name_0">@invite.InviteDate.ToString("dd MMM, yyyy")</span></li>
+                                                                            <li>Project<span class="font-primary personality_0">@invite.Project.Name</span></li>
+                                                                            <li>Invitor<span class="font-primary city_0">@invite.Invitor.FullName</span></li>
+                                                                            @if (invite.IsValid == true)
+                                                                            {
+                                                                                <li>Status<span class="font-primary mobile_num_0">Pending</span></li>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <li>Status<span class="font-primary mobile_num_0">Accepted</span></li>
+                                                                            }
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="right-history">
+                                    <div class="modal-header p-l-20 p-r-20">
+                                        <h6 class="modal-title w-100">Contact History<span class="pull-right"><a class="closehistory" href="javascript:void(0)"><i class="icofont icofont-close"></i></a></span></h6>
+                                    </div>
+                                    <div class="history-details">
+                                        @*@foreach(TicketHistory history in await _ticketHistoryService.GetCompanyTicketsHistoriesAsync(companyId))
+                                            <div class="media">
+                                                <i class="icofont icofont-star me-3"></i>
+                                                <div class="media-body mt-0">
+                                                    <h6 class="mt-0">Contact Created</h6>
+                                                    <p class="mb-0">Contact is created via mail</p><span class="f-12">Sep 10, 2019 4:00</span>
+                                                </div>
+                                            </div>*@
+                                    </div>
+                                </div>
+                                <div class="modal fade modal-bookmark" id="printModal" tabindex="-1" role="dialog" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Print preview</h5>
+                                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body list-persons">
+                                                <div class="profile-mail pt-0" id="DivIdToPrint">
+                                                    <div class="media">
+                                                        <img class="img-100 img-fluid m-r-20 rounded-circle" id="updateimg" src="../assets/images/user/2.png" alt="">
+                                                        <div class="media-body mt-0">
+                                                            <h5><span id="printname">Bucky </span><span id="printlast">Barnes</span></h5>
+                                                            <p id="printmail">barnes@gmail.com</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="email-general">
+                                                        <h6>General</h6>
+                                                        <p>Email Address: <span class="font-primary" id="mailadd">barnes@gmail.com   </span></p>
+                                                    </div>
+                                                </div>
+                                                <button class="btn btn-secondary" id="btnPrint" type="button" onclick="printDiv();">Print</button>
+                                                <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Container-fluid Ends-->

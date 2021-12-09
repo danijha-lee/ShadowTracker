@@ -347,6 +347,7 @@ namespace ShadowTracker.Controllers
             }
             AssignDeveloperViewModel model = new();
             model.Ticket = await _ticketService.GetTicketByIdAsync(ticketId.Value);
+
             model.Developers = new SelectList(await _projectService.GetProjectMembersByRoleAsync(model.Ticket.ProjectId, nameof(BTRoles.Developer)), "Id", "FullName");
 
             return View(model);
@@ -382,7 +383,7 @@ namespace ShadowTracker.Controllers
                     Title = "Ticket Assigned",
                     Message = $"Ticket : {model.Ticket.Title}, was assigned by {btUser.FullName}",
                     SenderId = userId,
-                    RecipientId = model.Ticket.DeveloperUserId
+                    RecipientId = model.DeveloperId
                 };
                 await _notificationService.AddNotificationAsync(notification);
                 await _notificationService.SendEmailNotificationAsync(notification, "New Ticket Added");

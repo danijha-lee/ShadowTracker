@@ -31,21 +31,15 @@ namespace ShadowTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ManageUserRoles()
+        public async Task<IActionResult> ManageUserRoles(string userId)
         {
-            List<ManageUserRolesViewModel> model = new List<ManageUserRolesViewModel>();
             int companyId = User.Identity.GetCompanyId().Value;
-            List<BTUser> users = await _companyInfoService.GetAllMembersAsync(companyId);
+            ManageUserRolesViewModel viewModel = new ManageUserRolesViewModel();
+            viewModel.BTUser = await _userManager.FindByIdAsync(userId);
+            IEnumerable<string> selected = await _rolesService.GetUserRolesAsync(viewModel.BTUser);
+            viewModel.Roles = new MultiSelectList(await _rolesService.GetRolesAsync(), "Name", "Name", selected);
 
-            foreach (BTUser user in users)
-            {
-                ManageUserRolesViewModel viewModel = new ManageUserRolesViewModel();
-                viewModel.BTUser = user;
-                IEnumerable<string> selected = await _rolesService.GetUserRolesAsync(user);
-                viewModel.Roles = new MultiSelectList(await _rolesService.GetRolesAsync(), "Name", "Name", selected);
-                model.Add(viewModel);
-            }
-            return View(model);
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -67,7 +61,14 @@ namespace ShadowTracker.Controllers
                 }
             }
 
-            return RedirectToAction(nameof(ManageUserRoles));
+            return RedirectToAction(nameof(ManageUserRoles), new { userId = btUser.Id});
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            int companyId = User.Identity.GetCompanyId().Value;
+            List<BTUser> users = await _companyInfoService.GetAllMembersAsync(companyId);
+            return View(users);
         }
     }
 }

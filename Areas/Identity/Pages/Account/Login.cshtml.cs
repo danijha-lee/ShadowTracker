@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using ShadowTracker.Models;
 
 namespace ShadowTracker.Areas.Identity.Pages.Account
@@ -21,14 +22,17 @@ namespace ShadowTracker.Areas.Identity.Pages.Account
         private readonly UserManager<BTUser> _userManager;
         private readonly SignInManager<BTUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly IConfiguration _configuration;
 
-        public LoginModel(SignInManager<BTUser> signInManager, 
-            ILogger<LoginModel> logger,
-            UserManager<BTUser> userManager)
+        public LoginModel(SignInManager<BTUser> signInManager,
+                            ILogger<LoginModel> logger,
+                            UserManager<BTUser> userManager,
+                            IConfiguration configuration = null)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [BindProperty]
@@ -72,12 +76,31 @@ namespace ShadowTracker.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
         }
 
-        public async Task<IActionResult> OnPostAsync(string returnUrl = null)
+        public async Task<IActionResult> OnPostAsync(string returnUrl = null, string demoEmail = null)
         {
             returnUrl ??= Url.Content("~/Home/Dashboard");
 
+            if (!string.IsNullOrEmpty(demoEmail))
+            {
+                string email = _configuration[demoEmail];
+                string password = _configuration["DemoUserPassword"];
+
+                var result = await _signInManager.PasswordSignInAsync(email, password, false, lockoutOnFailure: false);
+
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("User logged in.");
+                    return LocalRedirect(returnUrl);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return Page();
+                }
+            }
+
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-        
+
             if (ModelState.IsValid)
             {
                 // This doesn't count login failures towards account lockout

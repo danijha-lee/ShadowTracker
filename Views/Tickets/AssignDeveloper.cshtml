@@ -12,6 +12,8 @@
                 <div class="card-body">
                     <form method="post" asp-action="AssignDeveloper" asp-controller="Tickets">
                         <input asp-for="Ticket.Id" hidden />
+                        @if (Model.Developers.Count() > 0)
+                        {
                         <p>Description:  @Model.Ticket.Description</p>
                         <div class="form-group">
                             <label class="col-form-label">Select Developers</label>
@@ -22,6 +24,12 @@
                         <div class="form-group mt-3">
                             <input type="submit" value="Assign" class="btn btn-primary" />
                         </div>
+                        }
+                        else
+                        {
+                            <h5>There are no developers assigned to this project.</h5>
+                           <a class="btn btn-secondary" asp-action="AssignMembers" asp-controller="Projects" asp-route-projectId="@Model.Ticket.ProjectId">Add Developers </a>
+                        }
                     </form>
                 </div>
             </div>

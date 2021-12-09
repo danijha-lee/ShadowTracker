@@ -1,5 +1,59 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using ShadowTracker.Services.Interfaces
+@using Microsoft.AspNetCore.Identity;
+@using ShadowTracker.Extensions;
+@inject IBTProjectService _projectService
+@inject IImageService _imageService
+@inject IBTTicketHistoryService _ticketHistoryService
+@inject UserManager<BTUser> _userManager
+@inject IBTTicketService _ticketService
+@inject IBTCompanyInfoService _companyService
+@inject IBTRolesService _rolesService
+
 @{
+    ViewData["Title"] = "Index";
+    int companyId = User.Identity.GetCompanyId().Value;
+
+    BTUser user = await _userManager.GetUserAsync(User);
+    Company company = await _companyService.GetCompanyInfoByIdAsync(companyId);
 }
+
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-header pb-0">
+            <h5>@company.Name </h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="">
+                    <tr>
+                        @* Table header *@
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Projects</th>
+                        <th>Tickets</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (BTUser member in company.Members)
+                    {
+                        int count = (await _ticketService.GetTicketsByUserIdAsync(member.Id, companyId)).Count;
+                        <tr>
+
+                            <td>@member.FullName</td>
+
+                            <td>@((await _rolesService.GetUserRolesAsync(member)).FirstOrDefault())</td>
+                            <td>@member.Email</td>
+                            <td>@member.Projects?.Count</td>
+                            <td>@count</td>
+                            <td>
+
+                            <td><a class=" btn btn-warning btn-sm" asp-action="ManageUserRoles" asp-controller="UserRoles" asp-route-userId="@member.Id">Manage Role</a></td>
+                            <td> <a class="btn btn-secondary" asp-action="Details" asp-controller="Tickets" asp-route-id="@member.Id">DETAILS</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

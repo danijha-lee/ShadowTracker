@@ -25,13 +25,15 @@ namespace ShadowTracker.Controllers
         private readonly IBTInviteService _inviteService;
         private readonly UserManager<BTUser> _userManager;
         private readonly IDataProtector _protector;
+        private readonly IBTCompanyInfoService _companyService;
 
         public InvitesController(ApplicationDbContext context,
                                     IBTProjectService projectService,
                                     IEmailSender emailService,
                                     IBTInviteService inviteService,
                                     UserManager<BTUser> userManager,
-                                    IDataProtectionProvider dataProtectionProvider)
+                                    IDataProtectionProvider dataProtectionProvider,
+                                    IBTCompanyInfoService companyService)
         {
             _context = context;
             _projectService = projectService;
@@ -39,13 +41,17 @@ namespace ShadowTracker.Controllers
             _inviteService = inviteService;
             _userManager = userManager;
             _protector = dataProtectionProvider.CreateProtector("CF.ShadowTr@cker.2021!");
+            _companyService = companyService;
         }
 
         // GET: Invites
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Invites.Include(i => i.Company).Include(i => i.Invitee).Include(i => i.Invitor).Include(i => i.Project);
-            return View(await applicationDbContext.ToListAsync());
+            int companyId = User.Identity.GetCompanyId().Value;
+            Company company = await _companyService.GetCompanyInfoByIdAsync(companyId);
+            List<Invite> invites = company.Invites.Where(i => i.CompanyId == companyId).ToList();
+            ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
+            return View(invites);
         }
 
         // GET: Invites/Details/5

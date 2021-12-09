@@ -4,49 +4,52 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
 
-<h4>Ticket</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+<div class="col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="form theme-form">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <textarea asp-for="Title" class="form-control" ></textarea>
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group border border-dark">
+                        <label asp-for="Description" class="control-label"></label>
+                        <input asp-for="Description"  id="editor1" name="editor1" cols="4" rows="10" class="form-control" />
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
 
-            <div class="form-group">
-                <label asp-for="ProjectId" class="control-label"></label>
-                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TicketTypeId" class="control-label"></label>
-                <select asp-for="TicketTypeId" class="form-control" asp-items="ViewBag.TicketTypeId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="TicketPriorityId" class="control-label"></label>
-                <select asp-for="TicketPriorityId" class="form-control" asp-items="ViewBag.TicketPriorityId"></select>
-            </div>
+                    <div class="form-group">
+                        <label asp-for="ProjectId" class="control-label"></label>
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                            <option>Choose...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TicketTypeId" class="control-label"></label>
+                        <select asp-for="TicketTypeId" class="form-control" asp-items="ViewBag.TicketTypeId">
+                            <option>Choose...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TicketPriorityId" class="control-label"></label>
+                        <select asp-for="TicketPriorityId" class="form-control" asp-items="ViewBag.TicketPriorityId">
+                            <option>Choose...</option>
+                        </select>
+                    </div>
 
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+        @section Scripts {
+            @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        }

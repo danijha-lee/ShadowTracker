@@ -13,8 +13,9 @@
                         <input hidden asp-for="Project.Id" />
                         <div class="col-12 mb-3">
                             <div class="form-group">
-                                <select required asp-for="@Model.SelectedUsers" class="form-control" asp-items="@Model.Members" multiple="multiple"></select>
-                                <option></option>
+                                <select required asp-for="@Model.SelectedUsers"  asp-items="@Model.Members" class="js-example-placeholder-multiple col-sm-6" multiple="multiple">
+\                                <option>Choose..</option>
+                                </select>
                             </div>
                         </div>
                         <div class="form-group">

@@ -2,28 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShadowTracker.Data;
 using ShadowTracker.Models;
+using ShadowTracker.Models.Enums;
+using ShadowTracker.Services.Interfaces;
+using ShadowTracker.Extensions;
 
 namespace ShadowTracker.Controllers
 {
     public class NotificationsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IBTNotificationService _notificationService;
+        private readonly UserManager<BTUser> _userManager;
+        private readonly IBTProjectService _projectService;
+        private readonly IBTTicketService _ticketService;
+        private readonly IBTLookupService _lookupService;
 
-        public NotificationsController(ApplicationDbContext context)
+        public NotificationsController(ApplicationDbContext context,
+                                        IBTNotificationService notificationService,
+                                        IBTProjectService projectService,
+                                        IBTTicketService ticketService,
+                                        IBTLookupService lookupService,
+                                        UserManager<BTUser> userManager)
         {
             _context = context;
+            _notificationService = notificationService;
+            _projectService = projectService;
+            _ticketService = ticketService;
+            _lookupService = lookupService;
+            _userManager = userManager;
         }
 
         // GET: Notifications
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Notifications.Include(n => n.NotificationType).Include(n => n.Project).Include(n => n.Recipient).Include(n => n.Sender).Include(n => n.Ticket);
-            return View(await applicationDbContext.ToListAsync());
+            string userId = _userManager.GetUserId(User);
+            List<Notification> notifications = await _notificationService.GetReceivedNotificationsAsync(userId);
+            return View(notifications);
         }
 
         // GET: Notifications/Details/5
@@ -50,12 +70,20 @@ namespace ShadowTracker.Controllers
         }
 
         // GET: Notifications/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["NotificationTypeId"] = new SelectList(_context.NotificationTypes, "Id", "Name");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
+            BTUser user = await _userManager.GetUserAsync(User);
+            int companyId = User.Identity.GetCompanyId().Value;
+            if (User.IsInRole(nameof(BTRoles.Admin)))
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetAllProjectsByCompanyAsync(companyId), "Id", "Name");
+            }
+            else
+            {
+                ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(user.Id), "Id", "Name");
+            }
+            //ViewData["NotificationTypeId"] = new SelectList(await _lookupService.LookupNotificationTypeId(), "Id", "Name");
             ViewData["RecipientId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description");
             return View();
         }
@@ -65,12 +93,14 @@ namespace ShadowTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Message,Created,NotificationTypeId,Viewed,TicketId,ProjectId,RecipientId,SenderId")] Notification notification)
+        public async Task<IActionResult> Create([Bind("Id,Title,Message,NotificationTypeId,Viewed,TicketId,ProjectId,RecipientId")] Notification notification)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(notification);
-                await _context.SaveChangesAsync();
+                BTUser user = await _userManager.GetUserAsync(User);
+                notification.SenderId = user.Id;
+                notification.Created = DateTime.Now;
+                await _notificationService.AddNotificationAsync(notification);
                 return RedirectToAction(nameof(Index));
             }
             ViewData["NotificationTypeId"] = new SelectList(_context.NotificationTypes, "Id", "Name", notification.NotificationTypeId);

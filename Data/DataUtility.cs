@@ -73,8 +73,32 @@ namespace ShadowTracker.Data
             await SeedDefaultTicketStatusAsync(dbContextSvc);
             await SeedDefaultTicketPriorityAsync(dbContextSvc);
             await SeedDefaultProjectPriorityAsync(dbContextSvc);
+            await SeedDefaultNotificationTypesAsync(dbContextSvc);
             await SeedDefautProjectsAsync(dbContextSvc);
             await SeedDefautTicketsAsync(dbContextSvc);
+        }
+
+        private static async Task SeedDefaultNotificationTypesAsync(ApplicationDbContext context)
+        {
+            try
+            {
+                IList<Models.NotificationType> notificationTypes = new List<NotificationType>() {
+                                                    new NotificationType() { Name = BTNotificationTypes.Project.ToString() },
+                                                    new NotificationType() { Name = BTNotificationTypes.Ticket.ToString() },
+                };
+
+                var dbNotificationTypes = context.NotificationTypes.Select(c => c.Name).ToList();
+                await context.NotificationTypes.AddRangeAsync(notificationTypes.Where(c => !dbNotificationTypes.Contains(c.Name)));
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("*************  ERROR  *************");
+                Console.WriteLine("Error Seeding Project Priorities.");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("***********************************");
+                throw;
+            }
         }
 
         private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)

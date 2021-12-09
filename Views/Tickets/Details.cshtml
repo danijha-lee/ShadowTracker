@@ -17,7 +17,7 @@
 
 }
 
-<h1>Ticket Details</h1>
+
 @if (!string.IsNullOrEmpty(Model.DeveloperUserId))
 {
     <a href="javascript:void(0);">
@@ -28,7 +28,7 @@
         {
             <img class="media-object " src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
     </a>
-    <span class="text-muted" style="font-size:x-small;">
+    <span class="text-muted text-dark" style="font-size:x-small;">
         Developer:  <strong>@Model.DeveloperUser.FullName</strong>
     </span>}
 
@@ -36,11 +36,11 @@
     <div classxfont-weighteighteightgetainer-fluid">
         <div class="row gy-2">
             <div class="col-md-12 col">
-                <div class="row col-cols-2 mt-5 bg-secondary">
-                    <div class="card col m-1 p-2">
+                <div class="row col-cols-2 mt-5 ">
+                    <div class="card col m-1 p-2 text-dark">
                         <div class="card-body">
                             @*Title of Ticket*@
-                            <h5>@Model.Title</h5>
+                            <h3>@Model.Title</h3>
                             @*Description of Ticket*@
                             <p>@Model.Description</p>
                             <div class="progress-container progress-info m-b-25">
@@ -55,16 +55,16 @@
                                         var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
                                     }
                                     @*Variable from razor logic*@
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100" style="width: percent;">
+                                    <div class="progress-bar" role="progressbar"  aria-valuemin="0" aria-valuemax="100" style="width:@percent;">
                                         @*Variable from razor logic*@
-                                        <span class="progress-value">[Percent]%</span>
+                                        <span class="progress-value">@percent%</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="card col m-1 p-2">
-                        <div class="card-body">
+                        <div class="card-body text-dark">
                             <ul class="list-unstyled">
                                 @*Ticket date*@
                                 <li><strong>Date Entered:</strong> <span class=""> @Model.Created.ToString("dd/MM/yy")</span></li>
@@ -90,7 +90,7 @@
             </div>
             <div class="col-md-8 col col-cols-2 mt-5 ">
                 <div class="col">
-                    <div class="bg-secondary">
+                    <div class="text-dark">
                         <div class="card m-1 p-2">
                             <div class="card-header">
                                 <h2>Comments</h2>
@@ -117,8 +117,8 @@
                                     @*Loop to show comments made for the Ticket*@
                                     @foreach (TicketComment comment in Model.Comments)
                                     {
-                                        <li class="online mb-4">
-                                            <div class="media">
+                                        <li class=" mb-4">
+                                            <div class="">
                                                 <a href="javascript:void(0);">
                                                     @if (btUser?.AvatarFileData != null)
                                                     {
@@ -127,13 +127,13 @@
                                                     {
                                                         <img class="media-object " src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
                                                 </a>
-                                                <div class="media-body">
+                                                <div class="">
                                                     <span class="text-muted" style="font-size:x-small;">
                                                         @comment.User.FullName
                                                         <small class="float-right">@comment.Created.ToString("MM.dd.yyyy h:ss tt")</small>:
                                                     </span>
                                                 </div>
-                                                <span class="message text-primary">@Html.Raw(comment.Comment)</span>
+                                                <span class=" text-primary">@Html.Raw(comment.Comment)</span>
                                             </div>
                                         </li>
                                     }
@@ -145,8 +145,8 @@
                     </div>
                 </div>
                 <div class="col">
-                    <div class="bg-secondary">
-                        <div class="card m-1 p-2">
+                    <div class="">
+                        <div class="card m-1 p-2 text-dark">
                             <div class="card-header">
                                 <h2>Attachments</h2>
                             </div>
@@ -206,15 +206,15 @@
                 </div>
             </div>
             <div class="col-md-4 col mt-5 ">
-                <div class="bg-dark">
-                    <div class="card m-1 p-2">
+                <div class="">
+                    <div class="card m-1 p-2 text-dark">
                         <div class="card-header">
                             <h2>History</h2>
                             <hr />
                         </div>
-                        <div class="card-body" style="overflow-y:auto;height:1000px;background-color:antiquewhite">
+                        <div class="card-body" style="overflow-y:auto;height:1000px;">
                             @*Loop to show the history entries for the Ticket*@
-                            <div class="card-body" style="overflow-y:auto;height:1000px;background-color:antiquewhite">
+                            <div class="card-body" style="overflow-y:auto;height:1000px;">
                                 @foreach (TicketHistory history in Model.History)
                                 {
                                     <div class="">
