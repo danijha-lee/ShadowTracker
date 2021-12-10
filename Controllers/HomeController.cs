@@ -11,6 +11,7 @@ using ShadowTracker.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using ShadowTracker.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using X.PagedList;
 
 namespace ShadowTracker.Controllers
 {
@@ -38,8 +39,10 @@ namespace ShadowTracker.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Dashboard(string swalMessage = null)
+        public async Task<IActionResult> Dashboard(int? page, string swalMessage = null)
         {
+            var pageNumber = page ?? 1;
+            var pageSize = 5;
             ViewData["SwalMessage"] = swalMessage;
             DashboardViewModel model = new();
             int companyId = User.Identity.GetCompanyId().Value;
@@ -47,7 +50,7 @@ namespace ShadowTracker.Controllers
             model.Projects = await _companyInfoService.GetProjectsAsync(companyId);
             model.Members = await _companyInfoService.GetAllMembersAsync(companyId);
             model.Company = await _companyInfoService.GetCompanyInfoByIdAsync(companyId);
-
+            var members = await model.Members.ToPagedListAsync(pageNumber, pageSize);
             return View(model);
         }
 

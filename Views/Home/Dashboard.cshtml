@@ -1,25 +1,31 @@
 ﻿@model ShadowTracker.Models.ViewModels.DashboardViewModel
 @using ShadowTracker.Services.Interfaces
 @using Microsoft.AspNetCore.Identity;
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
 
 @inject IBTTicketService _ticketServie
 @inject IBTTicketHistoryService _ticketHistoryService
 @inject UserManager<BTUser> _userManager
+@inject IBTNotificationService _notificationService
 @{
     BTUser user = await _userManager.GetUserAsync(User);
     ViewData["Title"] = "Archer | Dashboard";
+    int notifications = (await _notificationService.GetReceivedNotificationsAsync(user.Id)).Count();
 }
 <!-- Container-fluid starts-->
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-6 col-xl-3 col-lg-6">
             <div class="card o-hidden border-0">
+
                 <div class="bg-primary b-r-4 card-body">
                     <div class="media static-top-widget">
                         <div class="align-self-center text-center"><i data-feather="database"></i></div>
                         <div class="media-body">
-                            <span class="m-0">Earnings</span>
-                            <h4 class="mb-0 counter">6659</h4><i class="icon-bg" data-feather="database"></i>
+                            <span class="m-0">Projects</span>
+                            <h4 class="mb-0 counter">@Model.Projects.Count()</h4><i class="icon-bg" data-feather="database"></i>
                         </div>
                     </div>
                 </div>
@@ -27,12 +33,13 @@
         </div>
         <div class="col-sm-6 col-xl-3 col-lg-6">
             <div class="card o-hidden border-0">
+
                 <div class="bg-secondary b-r-4 card-body">
                     <div class="media static-top-widget">
                         <div class="align-self-center text-center"><i data-feather="shopping-bag"></i></div>
                         <div class="media-body">
-                            <span class="m-0">Products</span>
-                            <h4 class="mb-0 counter">9856</h4><i class="icon-bg" data-feather="shopping-bag"></i>
+                            <span class="m-0">Tickets</span>
+                            <h4 class="mb-0 counter">@Model.Tickets.Count()</h4><i class="icon-bg" data-feather="shopping-bag"></i>
                         </div>
                     </div>
                 </div>
@@ -45,7 +52,7 @@
                         <div class="align-self-center text-center"><i data-feather="message-circle"></i></div>
                         <div class="media-body">
                             <span class="m-0">Messages</span>
-                            <h4 class="mb-0 counter">893</h4><i class="icon-bg" data-feather="message-circle"></i>
+                            <h4 class="mb-0 counter">@notifications</h4><i class="icon-bg" data-feather="message-circle"></i>
                         </div>
                     </div>
                 </div>
@@ -57,14 +64,13 @@
                     <div class="media static-top-widget">
                         <div class="align-self-center text-center"><i data-feather="user-plus"></i></div>
                         <div class="media-body">
-                            <span class="m-0">New Use</span>
-                            <h4 class="mb-0 counter">4531</h4><i class="icon-bg" data-feather="user-plus"></i>
+                            <span class="m-0">Memebers</span>
+                            <h4 class="mb-0 counter">@Model.Members.Count()</h4><i class="icon-bg" data-feather="user-plus"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
 
         <div class="col-xl-6 box-col-12 des-xl-100 invoice-sec card">
             <div class="col-xl-6 col-xs-12 col-md-6 col-sm-6">
@@ -444,270 +450,58 @@
                             </div>
                         </div>
                     </div>
-                    <div class="code-box-copy">
-                        <button class="code-box-copy__btn btn-clipboard" data-clipboard-target="#top-dealer" title="Copy"><i class="icofont icofont-copy-alt"></i></button>
-                        <pre><code class="language-html" id="top-dealer">&lt;div class="card"&gt;
- &lt;div class="card-header pb-0"&gt;
-   &lt;div class="header-top d-sm-flex justify-content-between align-items-center"&gt;
-       &lt;h5&gt;Top Dealer&lt;/h5&gt;
-       &lt;div class="center-content"&gt; 
-         &lt;p class="d-sm-flex align-items-center"&gt;&lt;span class="m-r-10"&gt;845 Dealer&lt;/span&gt;&lt;i class="toprightarrow-primary fa fa-arrow-up m-r-10"&gt;&lt;/i&gt;86% More Than Last Year&lt;/p&gt;
-       &lt;/div&gt;
-       &lt;div class="setting-list"&gt;
-           &lt;ul class="list-unstyled setting-option"&gt;
-             &lt;li&gt;
-               &lt;div class="setting-primary"&gt;&lt;i class="icon-settings"&gt;&lt;/i&gt;&lt;/div&gt;
-             &lt;/li&gt;
-             &lt;li&gt;&lt;i class="view-html fa fa-code font-primary"&gt;&lt;/i&gt;&lt;/li&gt;
-             &lt;li&gt;&lt;i class="icofont icofont-maximize full-card font-primary"&gt;&lt;/i&gt;&lt;/li&gt;
-             &lt;li&gt;&lt;i class="icofont icofont-minus minimize-card font-primary"&gt;&lt;/i&gt;&lt;/li&gt;
-             &lt;li&gt;&lt;i class="icofont icofont-refresh reload-card font-primary"&gt;&lt;/i&gt;&lt;/li&gt;
-             &lt;li&gt;&lt;i class="icofont icofont-error close-card font-primary"&gt; &lt;/i&gt;&lt;/li&gt;
-            &lt;/ul&gt;
-       &lt;/div&gt;
-   &lt;/div&gt;
- &lt;/div&gt;
- &lt;div class="card-body"&gt;
-     &lt;div id="owl-carousel-14" class="owl-carousel owl-theme"&gt;
-       &lt;div class="item"&gt;
-         &lt;div class="row"&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/1.png" alt="..."&gt;
-                   &lt;h6&gt;Thompson lee&lt;/h6&gt;
-                   &lt;p&gt;Malasiya&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/8.png" alt="..."&gt;
-                   &lt;h6&gt;johnson allon&lt;/h6&gt;
-                   &lt;p&gt;bangladeshlt&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/3.png" alt="..."&gt;
-                   &lt;h6&gt;williams reed&lt;/h6&gt;
-                   &lt;p&gt;Belgium&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/3.png" alt="..."&gt;
-                   &lt;h6&gt; Jones king&lt;/h6&gt;
-                   &lt;p&gt;Canada&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/5.png" alt="..."&gt;
-                   &lt;h6&gt;Brown davis&lt;/h6&gt;
-                   &lt;p&gt;China&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/6.png" alt="..."&gt;
-                   &lt;h6&gt;Wilson Hill&lt;/h6&gt;
-                   &lt;p&gt;Denmark&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/7.png" alt="..."&gt;
-                   &lt;h6&gt;Anderson ban&lt;/h6&gt;
-                   &lt;p&gt;Japan&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/8.png" alt="..."&gt;
-                   &lt;h6&gt;Thompson lee&lt;/h6&gt;
-                   &lt;p&gt;Malasiya&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-         &lt;/div&gt;
-       &lt;/div&gt;
-       &lt;div class="item"&gt;
-         &lt;div class="row"&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/1.png" alt="..."&gt;
-                   &lt;h6&gt;Thompson lee&lt;/h6&gt;
-                   &lt;p&gt;Malasiya&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/8.png" alt="..."&gt;
-                   &lt;h6&gt;johnson allon&lt;/h6&gt;
-                   &lt;p&gt;bangladeshlt&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/3.png" alt="..."&gt;
-                   &lt;h6&gt;williams reed&lt;/h6&gt;
-                   &lt;p&gt;Belgium&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/3.png" alt="..."&gt;
-                   &lt;h6&gt; Jones king&lt;/h6&gt;
-                   &lt;p&gt;Canada&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/5.png" alt="..."&gt;
-                   &lt;h6&gt;Brown davis&lt;/h6&gt;
-                   &lt;p&gt;China&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/6.png" alt="..."&gt;
-                   &lt;h6&gt;Wilson Hill&lt;/h6&gt;
-                   &lt;p&gt;Denmark&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/7.png" alt="..."&gt;
-                   &lt;h6&gt;Anderson ban&lt;/h6&gt;
-                   &lt;p&gt;Japan&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/8.png" alt="..."&gt;
-                   &lt;h6&gt;Thompson lee&lt;/h6&gt;
-                   &lt;p&gt;Malasiya&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-         &lt;/div&gt;
-       &lt;/div&gt;
-       &lt;div class="item"&gt;
-         &lt;div class="row"&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/1.png" alt="..."&gt;
-                   &lt;h6&gt;Thompson lee&lt;/h6&gt;
-                   &lt;p&gt;Malasiya&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/8.png" alt="..."&gt;
-                   &lt;h6&gt;johnson allon&lt;/h6&gt;
-                   &lt;p&gt;bangladeshlt&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/3.png" alt="..."&gt;
-                   &lt;h6&gt;williams reed&lt;/h6&gt;
-                   &lt;p&gt;Belgium&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/3.png" alt="..."&gt;
-                   &lt;h6&gt; Jones king&lt;/h6&gt;
-                   &lt;p&gt;Canada&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/5.png" alt="..."&gt;
-                   &lt;h6&gt;Brown davis&lt;/h6&gt;
-                   &lt;p&gt;China&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/6.png" alt="..."&gt;
-                   &lt;h6&gt;Wilson Hill&lt;/h6&gt;
-                   &lt;p&gt;Denmark&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/7.png" alt="..."&gt;
-                   &lt;h6&gt;Anderson ban&lt;/h6&gt;
-                   &lt;p&gt;Japan&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-           &lt;div class="col-sm-3"&gt;
-               &lt;div class="card"&gt;
-                 &lt;div class="top-dealerbox text-center"&gt;&lt;img class="card-img-top" src="../assets/images/dashboard-2/8.png" alt="..."&gt;
-                   &lt;h6&gt;Thompson lee&lt;/h6&gt;
-                   &lt;p&gt;Malasiya&lt;/p&gt;&lt;a class="btn btn-rounded" href="javascript:void(0)"&gt;View More&lt;/a&gt;
-                 &lt;/div&gt;
-               &lt;/div&gt;
-           &lt;/div&gt;
-         &lt;/div&gt;
-       &lt;/div&gt;
-     &lt;/div&gt;
-   &lt;/div&gt;
-&lt;/div&gt;</code></pre>
-                    </div>
                 </div>
             </div>
         </div>
         <div class="col-xl-8 col-md- des-xl-100 box-col-12">
             <div class="row">
-                <div class="col-xl-3 col-sm-6 box-col-3 chart_data_right">
-                    <div class="card income-card card-secondary">
-                        <div class="card-body align-items-center">
-                            <div class="round-progress knob-block text-center">
-                                <div class="progress-circle">
-                                    <input class="knob1" data-width="10" data-height="70" data-thickness=".3" data-angleoffset="0" data-linecap="round" data-fgcolor="#ba895d" data-bgcolor="#e0e9ea" value="60">
+                @foreach (Project project in Model.Projects.Take(1))
+                {
+                    @*Progress bar logic*@
+
+                    var start = project.StartDate.Value;
+                    var end = project.EndDate.Value;
+                    var today = DateTime.Now;
+                    var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+
+                    <div class="col-xl-3 col-sm-6 box-col-3 chart_data_right">
+                        <div class="card income-card card-secondary">
+                            <div class="card-body align-items-center">
+                                <div class="round-progress knob-block text-center">
+                                    <div class="progress-circle">
+                                        <input class="knob1" data-width="10" data-height="70" data-thickness=".3" data-angleoffset="0" data-linecap="round" data-fgcolor="#ba895d" data-bgcolor="#e0e9ea" value="@percent">
+                                    </div>
+                                    <a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id"> <p>@project.Name</p></a>
+                                    <p>Project</p>
                                 </div>
-                                <h5>$9,84,235</h5>
-                                <p>Our Annual Income</p>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-xl-3 col-sm-6 box-col-3 chart_data_right second">
-                    <div class="card income-card card-primary">
-                        <div class="card-body">
-                            <div class="round-progress knob-block text-center">
-                                <div class="progress-circle">
-                                    <input class="knob1" data-width="50" data-height="70" data-thickness=".3" data-fgcolor="#24695c" data-linecap="round" data-angleoffset="0" value="60">
+                }
+                @foreach (Project project2 in Model.Projects.Skip(1).Take(1))
+                {
+                    @*Progress bar logic*@
+
+                    var start = project2.StartDate.Value;
+                    var end = project2.EndDate.Value;
+                    var today = DateTime.Now;
+                    var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+
+                    <div class="col-xl-3 col-sm-6 box-col-3 chart_data_right second">
+                        <div class="card income-card card-primary">
+                            <div class="card-body">
+                                <div class="round-progress knob-block text-center">
+                                    <div class="progress-circle">
+                                        <input class="knob1" data-width="50" data-height="70" data-thickness=".3" data-fgcolor="#24695c" data-linecap="round" data-angleoffset="0" value="@percent">
+                                    </div>
+                                    
+                                    <a asp-action="Details" asp-controller="Projects" asp-route-id="@project2.Id"> <p>@project2.Name</p></a>
+                                    <p>Project</p>
                                 </div>
-                                <h5>$4,55,462</h5>
-                                <p>Our Annual Income</p>
                             </div>
                         </div>
                     </div>
-                </div>
+                }
                 <div class="col-xl-6 box-col-6 top-sell-sec">
                     <div class="card">
                         <div class="card-header pb-0">
@@ -790,7 +584,7 @@
          &lt;/ul&gt;
        &lt;/div&gt;
        &lt;a class="btn btn-iconsolid" href="javascript:void(0)"&gt;&lt;i class="icon-bag"&gt;&lt;/i&gt;&lt;/a&gt;
-     &lt;/div&gt; 
+     &lt;/div&gt;
 &lt;/div&gt;                                                </code></pre>
                             </div>
                         </div>
@@ -852,7 +646,7 @@
    &lt;div class="card-body"&gt;
       &lt;div id="chart-dash-2-line"&gt;
       &lt;/div&gt;
-   &lt;/div&gt; 
+   &lt;/div&gt;
 &lt;/div&gt;        </code></pre>
                             </div>
                         </div>
@@ -1082,7 +876,7 @@
                   &lt;i class=" toprightarrow-primary fa fa-arrow-up m-r-10"&gt;&lt;/i&gt;  $9657.55k
                 &lt;/span&gt; 86% more then last year
             &lt;/p&gt;
-         &lt;/div&gt;                                             
+         &lt;/div&gt;
      &lt;div class="setting-list"&gt;
        &lt;ul class="list-unstyled setting-option"&gt;
          &lt;li&gt;
@@ -1100,7 +894,7 @@
    &lt;div class="card-body p-0 chart-block"&gt;
       &lt;div id="chart-yearly-growth-dash-2"&gt;
       &lt;/div&gt;
-   &lt;/div&gt; 
+   &lt;/div&gt;
 &lt;/div&gt;        </code></pre>
                     </div>
                 </div>
