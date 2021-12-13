@@ -33,6 +33,21 @@ namespace ShadowTracker.Services
             }
         }
 
+        public async Task<IQueryable<BTUser>> GetPagedMembersAsync(int companyId)
+        {
+            List<BTUser> result = new();
+            try
+            {
+                result = await _context.Users.Where(u => u.CompanyId == companyId).ToListAsync();
+
+                return result.AsQueryable<BTUser>();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<Company> GetCompanyInfoByIdAsync(int? companyId)
         {
             Company result = new();
@@ -102,6 +117,7 @@ namespace ShadowTracker.Services
                 {
                     result = await _context.Tickets.Where(t => t.Project.CompanyId == companyId)
                         .Include(t => t.Project)
+                        .Include(t => t.History)
                         .ToListAsync();
                 }
                 return result;

@@ -251,6 +251,7 @@ namespace ShadowTracker.Controllers
                         Created = DateTime.Now,
                         SenderId = userId,
                         RecipientId = projectManager?.Id,
+                        NotificationTypeId = 0
                     };
                     await _notificationService.AddNotificationAsync(notification);
                     if (projectManager != null)

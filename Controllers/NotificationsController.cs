@@ -22,13 +22,15 @@ namespace ShadowTracker.Controllers
         private readonly IBTProjectService _projectService;
         private readonly IBTTicketService _ticketService;
         private readonly IBTLookupService _lookupService;
+        private readonly IBTCompanyInfoService _infoService;
 
         public NotificationsController(ApplicationDbContext context,
                                         IBTNotificationService notificationService,
                                         IBTProjectService projectService,
                                         IBTTicketService ticketService,
                                         IBTLookupService lookupService,
-                                        UserManager<BTUser> userManager)
+                                        UserManager<BTUser> userManager,
+                                        IBTCompanyInfoService infoService)
         {
             _context = context;
             _notificationService = notificationService;
@@ -36,6 +38,7 @@ namespace ShadowTracker.Controllers
             _ticketService = ticketService;
             _lookupService = lookupService;
             _userManager = userManager;
+            _infoService = infoService;
         }
 
         // GET: Notifications
@@ -83,9 +86,27 @@ namespace ShadowTracker.Controllers
                 ViewData["ProjectId"] = new SelectList(await _projectService.GetUserProjectsAsync(user.Id), "Id", "Name");
             }
             //ViewData["NotificationTypeId"] = new SelectList(await _lookupService.LookupNotificationTypeId(), "Id", "Name");
-            ViewData["RecipientId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["RecipientId"] = new SelectList(await _infoService.GetAllMembersAsync(companyId), "Id", "FullName");
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description");
             return View();
+        }
+
+        //POST : Notifications/ SendNotificaiton
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendNotification(string RecipientId, string Message, string Title)
+        {
+            Notification notification = new();
+            notification.RecipientId = RecipientId;
+            notification.Message = Message;
+            notification.Title = Title;
+            notification.Created = DateTime.Now;
+            BTUser user = await _userManager.GetUserAsync(User);
+            notification.SenderId = user.Id;
+            notification.NotificationTypeId = 1;
+            await _notificationService.AddNotificationAsync(notification);
+            await _notificationService.SendEmailNotificationAsync(notification, Title);
+
+            return RedirectToAction("Index", "Notifications");
         }
 
         // POST: Notifications/Create

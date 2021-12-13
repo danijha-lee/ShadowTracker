@@ -103,6 +103,9 @@
 /**=====================
      01. General CSS Start
 ==========================**/
+.minHeight{
+    height: 20rem !important;
+}
 html {
   max-width: 100vw;
   overflow-x: hidden; }

@@ -15,5 +15,7 @@ namespace ShadowTracker.Services.Interfaces
         public Task<List<Project>> GetProjectsAsync(int? companyId);
 
         public Task<List<Ticket>> GetTicketsAsync(int? companyId);
+
+        public Task<IQueryable<BTUser>> GetPagedMembersAsync(int companyId);
     }
 }
