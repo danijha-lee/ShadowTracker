@@ -47,5 +47,10 @@ namespace ShadowTracker.Models
         public virtual Company Company { get; set; }
 
         public virtual ICollection<Project> Projects { get; set; }
+        public byte[] ProfilePicture { get; set; }
+
+        [NotMapped]
+        [DataType(DataType.Upload)]
+        public IFormFile ProfileFormFile { get; set; }
     }
 }
