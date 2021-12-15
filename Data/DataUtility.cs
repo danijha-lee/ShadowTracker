@@ -85,6 +85,7 @@ namespace ShadowTracker.Data
                 IList<Models.NotificationType> notificationTypes = new List<NotificationType>() {
                                                     new NotificationType() { Name = BTNotificationTypes.Project.ToString() },
                                                     new NotificationType() { Name = BTNotificationTypes.Ticket.ToString() },
+                                                    new NotificationType() { Name = BTNotificationTypes.Chat.ToString() },
                 };
 
                 var dbNotificationTypes = context.NotificationTypes.Select(c => c.Name).ToList();

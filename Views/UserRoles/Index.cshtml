@@ -27,6 +27,7 @@
                 <thead class="">
                     <tr>
                         @* Table header *@
+                        <td>Member</td>
                         <th>Name</th>
                         <th>Role</th>
                         <th>Email</th>
@@ -39,7 +40,19 @@
                     {
                         int count = (await _ticketService.GetTicketsByUserIdAsync(member.Id, companyId)).Count;
                         <tr>
+                            @if (member.AvatarFileData != null)
+                            {
+                                <td>
+                                    <img class="img-fluid rounded-circle me-3" src="data:image/*;base64,@(Convert.ToBase64String(member.AvatarFileData))" width="64" height="64" alt="...">
+                                </td>
+                            }
+                            else
+                            {
+                                <td>
+                                    <img class="img-fluid rounded-circle me-3" src="/assets/images/dashboard/1.png" alt="...">
+                                </td>
 
+                            }
                             <td>@member.FullName</td>
 
                             <td>@((await _rolesService.GetUserRolesAsync(member)).FirstOrDefault())</td>
@@ -47,11 +60,17 @@
                             <td>@member.Projects?.Count</td>
                             <td>@count</td>
                             <td>
-
-                            <td><a class=" btn btn-warning btn-sm" asp-action="ManageUserRoles" asp-controller="UserRoles" asp-route-userId="@member.Id">Manage Role</a></td>
-                            <td> <a class="btn btn-secondary" asp-action="Details" asp-controller="Tickets" asp-route-id="@member.Id">DETAILS</a></td>
-                        </tr>
-                    }
+                                @if (User.IsInRole("Admin"))
+                                {
+                                <td><a class=" btn btn-warning btn-sm" asp-action="ManageUserRoles" asp-controller="UserRoles" asp-route-userId="@member.Id">Manage Role</a></td>
+                                <td> <a class="btn btn-secondary" asp-action="Create" asp-controller="Notifications">Message</a></td>
+                            }
+                            else
+                            {
+                                <td> <a class="btn btn-secondary" asp-action="Create" asp-controller="Notifications">Message</a></td>
+                            }
+                            </tr>
+                        }
                 </tbody>
             </table>
         </div>

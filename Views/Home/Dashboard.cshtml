@@ -108,7 +108,7 @@
         </div>
 
 
-        <div class="col-xl-6 box-col-12 des-xl-100   top-dealer-sec">
+        <div class="col-xl-6 box-col-12 des-xl-100  mb-5  top-dealer-sec">
             <div class="card minHeight">
                 <div class="card-header pb-0">
                     <div class="header-top d-sm-flex justify-content-between align-items-center">
@@ -123,15 +123,24 @@
                             <div class="item ">
                                 <div class="card ">
                                     <div class="top-dealerbox text-center">
-                                        <img class="card-img-top" src="../assets/images/dashboard-2/1.png" alt="...">
-                                        <h6>@member.FullName</h6>
+                                        @if (member.AvatarFileData != null)
+                                        {
+                                            <img class="card-img-top" src="data:image/*;base64,@(Convert.ToBase64String(member.AvatarFileData))" alt="...">
+                                        }
+                                        else
+                                        {
+                                            <img class="card-img-top" src="/assets/images/dashboard/1.png" alt="...">
+
+                                        }
+                                        <h6>@member.FirstName</h6>
+                                        <h6>@member.LastName</h6>
                                         <p>@((await _rolesService.GetUserRolesAsync(member)).FirstOrDefault())</p>
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
-                    <div @*class="pagination-layout1"*@>
+                    <div  @*class="pagination-layout1"*@>
                         @Html.PagedListPager(Model.Members, page => Url.Action("Dashboard", new { page = page }),
                     new PagedListRenderOptions
                     {

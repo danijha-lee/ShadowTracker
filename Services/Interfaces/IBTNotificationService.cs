@@ -19,5 +19,9 @@ namespace ShadowTracker.Services.Interfaces
         public Task SendMembersEmailNotificationsAsync(Notification notification, List<BTUser> members);
 
         public Task<bool> SendEmailNotificationAsync(Notification notification, string emailSubject);
+
+        public Task<List<Notification>> GetChatAlertsAsync(string userId);
+
+        public Task<List<Notification>> GetNotificationAlertsAsync(string userId);
     }
 }

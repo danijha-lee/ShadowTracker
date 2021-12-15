@@ -61,9 +61,10 @@ namespace ShadowTracker.Controllers
                 }
             }
 
-            return RedirectToAction(nameof(ManageUserRoles), new { userId = btUser.Id});
+            return RedirectToAction(nameof(ManageUserRoles), new { userId = btUser.Id });
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             int companyId = User.Identity.GetCompanyId().Value;

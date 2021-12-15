@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using ShadowTracker.Data;
 using ShadowTracker.Models;
+using ShadowTracker.Models.Enums;
 using ShadowTracker.Services.Interfaces;
 
 namespace ShadowTracker.Services
@@ -123,6 +124,36 @@ namespace ShadowTracker.Services
                     notification.RecipientId = btUser.Id;
                     await SendEmailNotificationAsync(notification, notification.Title);
                 }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Notification>> GetNotificationAlertsAsync(string userId)
+        {
+            try
+            {
+                List<Notification> notifications = await GetReceivedNotificationsAsync(userId);
+                var projectNotifyId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Project))).Id;
+                var ticketNotifyId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Ticket))).Id;
+                return notifications.Where(n => n.NotificationTypeId == projectNotifyId || n.NotificationTypeId == ticketNotifyId).ToList();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Notification>> GetChatAlertsAsync(string userId)
+        {
+            try
+            {
+                List<Notification> notifications = await GetReceivedNotificationsAsync(userId);
+                var chatNotifyId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Chat))).Id;
+
+                return notifications.Where(n => n.NotificationTypeId == chatNotifyId).ToList();
             }
             catch (Exception)
             {

@@ -102,7 +102,7 @@ namespace ShadowTracker.Controllers
             notification.Created = DateTime.Now;
             BTUser user = await _userManager.GetUserAsync(User);
             notification.SenderId = user.Id;
-            notification.NotificationTypeId = 2;
+            notification.NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Chat))).Value;
             await _notificationService.AddNotificationAsync(notification);
             await _notificationService.SendEmailNotificationAsync(notification, Title);
 
@@ -121,6 +121,7 @@ namespace ShadowTracker.Controllers
                 BTUser user = await _userManager.GetUserAsync(User);
                 notification.SenderId = user.Id;
                 notification.Created = DateTime.Now;
+                notification.NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Chat))).Value;
                 await _notificationService.AddNotificationAsync(notification);
                 return RedirectToAction(nameof(Index));
             }
