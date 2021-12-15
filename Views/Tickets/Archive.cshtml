@@ -1,0 +1,29 @@
+﻿@model ShadowTracker.Models.Ticket
+
+@{
+    ViewData["Title"] = "Archive";
+}
+<div>
+
+    <div class="row">
+
+        <div class="card col-6" style="margin:2px">
+            <div class="card-body">
+
+                <h3 class="m-t-0 h3"><b>@Model.Title</b></h3>
+                <hr />
+                <p class="text-muted font-13 m-b-30">
+                  Description:  @Model.Description
+                </p>
+                <h6>Are you sure you want to Archive this?</h6>
+                <form asp-action="Archive">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="submit" value="Archive" class="btn btn-danger" /> |
+                    <a class="btn btn-primary" asp-action="AllTickets" asp-controller="Tickets">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+</div>

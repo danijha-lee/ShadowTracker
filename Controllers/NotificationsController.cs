@@ -102,7 +102,7 @@ namespace ShadowTracker.Controllers
             notification.Created = DateTime.Now;
             BTUser user = await _userManager.GetUserAsync(User);
             notification.SenderId = user.Id;
-            notification.NotificationTypeId = 1;
+            notification.NotificationTypeId = 2;
             await _notificationService.AddNotificationAsync(notification);
             await _notificationService.SendEmailNotificationAsync(notification, Title);
 

@@ -22,6 +22,8 @@
             history.Add(ticketHistory);
         }
     }
+
+    var today2 = DateTime.Now;
 }
 <!-- Container-fluid starts-->
 <div class="container-fluid">
@@ -81,30 +83,30 @@
             </div>
         </div>
 
-       
-            <div class="col-xl-6 xl-100 minHeight box-col-12">
-                <div class="card">
-                    <div class="cal-date-widget card-body">
-                        <div class="row">
-                            <div class="col-xl-6 col-xs-12 col-md-6 col-sm-6">
-                                <div class="cal-info text-center">
-                                    <div>
-                                        <h2>24</h2>
-                                        <div class="d-inline-block"><span class="b-r-dark pe-3">March</span><span class="ps-3">2018</span></div>
-                                        <p class="f-16">There is no minimum donation, any sum is appreciated</p>
-                                    </div>
+
+        <div class="col-xl-6 xl-100 minHeight box-col-12 ">
+            <div class="card ">
+                <div class="cal-date-widget card-body">
+                    <div class="row">
+                        <div class="col-xl-6 col-xs-12 col-md-6 col-sm-6">
+                            <div class="cal-info text-center">
+                                <div class="offset-3">
+                                    <h2>@today2.ToString("dd")</h2>
+                                    <div class="d-inline-block"><span class="b-r-dark pe-3">@today2.ToString("MMMM")</span><span class="ps-3">@today2.ToString("yyyy")</span></div>
+                                    <p class="f-16">Have A Great Day!</p>
                                 </div>
                             </div>
-                            <div class="col-xl-6 col-xs-12 col-md-6 col-sm-6">
-                                <div class="cal-datepicker">
-                                    <div class="datepicker-here float-sm-end" data-language="en">           </div>
-                                </div>
+                        </div>
+                        <div class="col-xl-6 col-xs-12 col-md-6 col-sm-6">
+                            <div class="cal-datepicker">
+                                <div class="datepicker-here float-sm-end" data-language="en">           </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-       
+        </div>
+
 
         <div class="col-xl-6 box-col-12 des-xl-100   top-dealer-sec">
             <div class="card minHeight">
@@ -128,14 +130,14 @@
                                 </div>
                             </div>
                         }
-                        </div>
-                        <div @*class="pagination-layout1"*@>
-                            @Html.PagedListPager(Model.Members, page => Url.Action("Dashboard", new { page = page }),
-                        new PagedListRenderOptions
-                        {
-                            LiElementClasses = new string[] { "page-item" },
-                            PageClasses = new string[] { "page-link" }
-                        })
+                    </div>
+                    <div @*class="pagination-layout1"*@>
+                        @Html.PagedListPager(Model.Members, page => Url.Action("Dashboard", new { page = page }),
+                    new PagedListRenderOptions
+                    {
+                        LiElementClasses = new string[] { "page-item" },
+                        PageClasses = new string[] { "page-link" }
+                    })
 
 
 
@@ -145,8 +147,8 @@
             </div>
         </div>
     </div>
-   
-    <div class="col">
+
+    <div class="col mt-4">
         <div class="row">
             @if (Model.Projects.Count == 0)
             {
@@ -161,7 +163,7 @@
                         </div>
                     </div>
                 </div>
-               
+
             }
             @foreach (Project project in Model.Projects.Take(1))
             {
@@ -247,10 +249,10 @@
             {
                 @*Progress bar logic*@
 
-            var start = project3.StartDate.Value;
-            var end = project3.EndDate.Value;
-            var today = DateTime.Now;
-            var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+                var start = project3.StartDate.Value;
+                var end = project3.EndDate.Value;
+                var today = DateTime.Now;
+                var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
                 <div class="col">
                     <div class="card social-widget-card">
                         <div class="card-body">
@@ -270,78 +272,84 @@
                     </div>
                 </div>
             }
-                <div class="col-xl-8 box-col-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="header-top d-sm-flex justify-content-between align-items-center">
-                                <h5>Company Tickets</h5>
-                            </div>
-                        </div>
-                        <div class="table-responsive" style="overflow-y:auto;height:600px;">
-                            <table class="table table-hover">
-                                <thead class="">
-                                    <tr>
-                                        @* Table header *@
-                                        <th>Title</th>
-                                        <th>Developer</th>
-                                        <th>Status</th>
-                                        <th>Priority</th>
-                                        <th>Type</th>
-                                        <th>Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if(Model.Tickets.Count == 0)
-                                    {
-                                        <tr>
-                                            <td colspan="6" class="text-center">
-                                                <p class="text-center">No Tickets Yet.</p>
-                                                <a class=" btn btn-secondary " asp-action="Create" asp-controller="Tickets">Add Ticket</a>
-                                            </td>
-                                        </tr>
-                                    }
-                                    @foreach (Ticket ticket in Model.Tickets.Take(9))
-                                    {
-                                        <tr>
-
-                                            <td>@ticket.Title</td>
-                                            @if (ticket.DeveloperUser != null)
-                                            {
-                                                <td>@ticket.DeveloperUser.FullName</td>
-                                            }
-                                            else
-                                            {
-                                                <td><a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.ProjectId">Assign Developer</a></td>
-                                            }
-
-                                            <td>@ticket.TicketStatus.Name</td>
-                                            <td>@ticket.TicketPriority.Name</td>
-                                            <td>@ticket.TicketType.Name</td>
-                                            <td>@ticket.Created.ToString("dd/MM/yy")</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+            <div class="col-xl-8 box-col-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="header-top d-sm-flex justify-content-between align-items-center">
+                            <h5>Company Tickets</h5>
                         </div>
                     </div>
-                </div>
-                <div class="col-xl-4 des-xl-50 box-col-12 activity-sec chart_data_left">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="header-top d-sm-flex justify-content-between align-items-center">
-                                <h5 class="m-0">Activity Timeline</h5>
-                            </div>
-                            <hr />
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-main activity-timeline update-line">
-                                @if(history.Count == 0)
+                    <div class="table-responsive" style="overflow-y:auto;height:600px;">
+                        <table class="table table-hover">
+                            <thead class="">
+                                <tr>
+                                    @* Table header *@
+                                    <th>Title</th>
+                                    <th>Developer</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Tickets.Count == 0)
                                 {
-                                    <p>No Activity Yet.</p>
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            <p class="text-center">No Tickets Yet.</p>
+                                            <a class=" btn btn-secondary " asp-action="Create" asp-controller="Tickets">Add Ticket</a>
+                                        </td>
+                                    </tr>
                                 }
-                                 else{
-                                
-                                @foreach(TicketHistory ticketHistory in history.Take(4).OrderByDescending(t => t.Created))
+                                @foreach (Ticket ticket in Model.Tickets.Take(9))
+                                {
+                                    <tr>
+
+                                        <td>@ticket.Title</td>
+                                        @if (ticket.DeveloperUser != null)
+                                        {
+                                            <td>@ticket.DeveloperUser.FullName</td>
+                                        }
+                                        else if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+
+                                        {
+                                            <td><a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.ProjectId">Assign Developer</a></td>
+                                        }
+                                        else
+                                        {
+                                            <td>Not Assigned</td>
+                                        }
+
+                                        <td>@ticket.TicketStatus.Name</td>
+                                        <td>@ticket.TicketPriority.Name</td>
+                                        <td>@ticket.TicketType.Name</td>
+                                        <td>@ticket.Created.ToString("dd/MM/yy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 des-xl-50 box-col-12 activity-sec chart_data_left">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="header-top d-sm-flex justify-content-between align-items-center">
+                            <h5 class="m-0">Activity Timeline</h5>
+                        </div>
+                        <hr />
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-main activity-timeline update-line">
+                            @if (history.Count == 0)
+                            {
+                                <p>No Activity Yet.</p>
+                            }
+                            else
+                            {
+
+                                @foreach (TicketHistory ticketHistory in history.Take(4).OrderByDescending(t => t.Created))
                                 {
                                     <div class="media">
                                         <div class="activity-line"></div>
@@ -353,12 +361,12 @@
                                         </div>
                                     </div>
                                 }
-                                }
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
     </div>
 
 </div>

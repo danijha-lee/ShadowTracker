@@ -33,7 +33,7 @@
                                         var today = DateTime.Now;
                                         var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
                                     }
-                                   
+
                                     <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: @percent%">
                                         @* Use Progress Bar code variable here *@
                                         <span class="progress-value">100%</span>
@@ -57,7 +57,18 @@
                                 {
                                     <li>Status: <span class="">Active</span></li>
                                 }
+
                             </ul>
+                            @if (Model.Archived == false && User.IsInRole("Admin"))
+                            {
+                                <a class="btn btn-danger btn-sm mt-1" asp-action="Archive" asp-controller="Projects" asp-route-id="@Model.Id">Archive</a>
+                                <a class="btn btn-warning btn-sm mt-1" asp-action="Edit" asp-controller="Projects" asp-route-id="@Model.Id">Edit</a>
+                            }
+                            else if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+                            {
+                                <a class="btn btn-warning btn-sm mt-1" asp-action="Edit" asp-controller="Projects" asp-route-id="@Model.Id">Edit</a>
+
+                            }
                         </div>
                     </div>
                 </div>
@@ -68,27 +79,57 @@
                         <div class="card-header">
                             <h2>Project Manager</h2>
                             <hr />
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="btn btn-warning btn-sm " asp-action="AssignPm" asp-controller="Projects">Edit</a>
+                            }
                         </div>
                         <div class="card-body" style="overflow-y:auto;height:300px;">
                             @if (projectManager != null)
                             {
-                                @if (projectManager?.AvatarFormFile != null)
-                                {
+                                <table class="table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
 
-                                    @* if() logic for Avatar/Default etc *@
-                                    <img src="@_imageService.DecodeImage(Model.ImageFileData, Model.ImageContentType)" />
-                                    <h5>@projectManager?.FullName</h5>
-                                }
+                                            @if (projectManager?.AvatarFileData != null)
+                                            {
 
-                                else
-                                {
-                                    <div class="body" style="overflow-y:auto;height:300px;">
+                                                @* if() logic for Avatar/Default etc *@
+                                                <td>
+                                                    <img class="img-34 me-2 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(projectManager?.AvatarFileData))" width="64" height="64" />
+                                                </td>
+                                                <td>
+                                                    <p class="mx-2">@projectManager?.FullName</p>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary btn-sm" asp-action="Create" asp-controller="Notifications">Send Message</a>
+                                                </td>
+                                            }
 
-                                        @* if() logic for Avatar/Default etc *@
-                                        <img src="~/img/SuitDefaultAccountImage.png" />
-                                        <h5>@projectManager?.FullName</h5>
-                                    </div>
-                                }
+                                            else
+                                            {
+                                                <td>
+
+                                                    @* if() logic for Avatar/Default etc *@
+                                                    <img class="img-34 me-2 rounded-circle" src="/assets/images/dashboard/1.png" width="64" height="64" />
+                                                </td>
+                                                <td>
+                                                    <p>@projectManager?.FullName</p>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-primary btn-sm" asp-action="Create" asp-controller="Notifications">Send Message</a>
+                                                </td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
                             }
                         </div>
                     </div>
@@ -100,46 +141,78 @@
                         <div class="card-header">
                             <h2>Project Team</h2>
                             <hr />
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a class="btn btn-warning btn-sm" asp-action="AssignPM" asp-controller="Projects" asp-route-projectId="@Model.Id">Assign Project Manager</a>
-                                }
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a class="btn btn-warning btn-sm" asp-action="AssignPM" asp-controller="Projects" asp-route-projectId="@Model.Id">Assign Project Manager</a>
+                            }
 
-                                @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
-                                {
-                                    <a class="btn btn-warning btn-sm " asp-action="AssignMembers" asp-controller="Projects" asp-route-projectId="@Model.Id">Assign Members</a>
-                                }
+                            @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+                            {
+                                <a class="btn btn-warning btn-sm " asp-action="AssignMembers" asp-controller="Projects" asp-route-projectId="@Model.Id">Assign Members</a>
+                            }
                         </div>
                         <div class="card-body" style="overflow-y:auto;height:300px;">
-                            <ul class="right_chat list-unstyled mb-0">
-                                @if (Model.Members.Count != 0)
-                                {
-                                    @foreach (BTUser user in Model.Members)
+
+                            <table class="table-borderless">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th></th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @if (Model.Members.Count != 0)
                                     {
-                                        
+                                        @foreach (BTUser user in Model.Members)
+                                        {
+
                                             @if (user.AvatarFormFile != null)
                                             {
-                                                <img class="img-34 me-2 rounded-circle bs-tooltip" title="@user.FullName" src="@_imageService.DecodeImage(user.AvatarFileData, user.AvatarContentType)" />
+                                                <tr>
+                                                    <td>
+                                                        <img class="img-34 me-2 rounded-circle bs-tooltip" title="@user.FullName" src="@_imageService.DecodeImage(user.AvatarFileData, user.AvatarContentType)" />
+                                                    </td>
+                                                    <td>
+                                                        <p class="mx-2">@user.FullName</p>
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-primary btn-sm" asp-action="Create" asp-controller="Notifications">Send Message</a>
+                                                    </td>
+                                                </tr>
                                             }
-                                            else 
+                                            else
                                             {
-                                                <img class="img-34 me-2 rounded-circle bs-tooltip" title="@user.FullName" src="/assets/images/SuitDefaultAccountImage.png" width="64" height="64" />
+                                                <tr>
+                                                    <td>
+                                                        <img class="img-34 me-2 rounded-circle bs-tooltip" title="@user.FullName" src="/assets/images/SuitDefaultAccountImage.png" width="64" height="64" />
+                                                    </td>
+                                                    <td>
+                                                        <p class="mx-2">@user.FullName</p>
+                                                    </td>
+                                                    <td>
+                                                        <a class="btn btn-primary btn-sm" asp-action="Create" asp-controller="Notifications">Send Message</a>
+                                                    </td>
+                                                </tr>
                                             }
-                                       
+
+                                        }
                                     }
-                                }
-                                else
-                                {
-                                    <p>No Members Assigned To This Project.</p>
+                                    else
+                                    {
+                                        <tr>
+                                            <td>
+                                                <p>No Members Assigned To This Project.</p>
+                                            </td>
+                                        </tr>
+                                    }
 
-                                }
 
 
-                                @if (!User.IsInRole("Admin") && !User.IsInRole("ProjectManager"))
-                                {
-                                    <p>No Members Assigned to this Project</p>
-                                }
-                            </ul>
+
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -148,84 +221,101 @@
                 <div class="">
                     <div class="card m-1 p-2 text-dark">
                         <div class="card-body">
-                        <div class="header">
-                            <h2>Project Activity</h2>
-                            <hr />
-                        </div>
-                        <div class="body vertical-scroll scroll-bar-wrap" style="overflow-y:auto;height:300px; ">
-                            @* Project Activity loop *@
-                            @foreach (TicketHistory history in await _ticketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, btUser.CompanyId))
-                            {
-                                <div class="">
-                                    <span class="date">@history.Created.ToString("dd MMM yyyy")</span>
-                                    <h6>@history.Description</h6>
-                                    <span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
+                            <div class="header">
+                                <h2>Project Activity</h2>
+                                <hr />
+                            </div>
+                            <div class="body vertical-scroll scroll-bar-wrap" style="overflow-y:auto;height:300px; ">
+                                @* Project Activity loop *@
+                                @foreach (TicketHistory history in await _ticketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, btUser.CompanyId))
+                                {
                                     <div class="">
-                                        <p>The ticket <b>@history.Property</b>  was edited</p>
-                                        <p>@($"Previous {history.Property}:  {history.OldValue}")</p>
-                                        <p>@($"Current {history.Property}:  {history.NewValue}")</p>
-                                    </div>
-                                </div>}
+                                        <span class="date">@history.Created.ToString("dd MMM yyyy")</span>
+                                        <h6>@history.Description</h6>
+                                        <span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
+                                        <div class="">
+                                            <p>The ticket <b>@history.Property</b>  was edited</p>
+                                            <p>@($"Previous {history.Property}:  {history.OldValue}")</p>
+                                            <p>@($"Current {history.Property}:  {history.NewValue}")</p>
+                                        </div>
+                                    </div>}
+                            </div>
                         </div>
                     </div>
-                   </div>
                 </div>
             </div>
             <div class="col-md-12 col">
-                <div class="mt-5 ">
-                    <div class="card m-1 p-2 text-dark">
+                <div class="mt-2">
+                    <div class="card  p-2 text-dark">
                         <div class="card-header">
                             <h2 class="text-center">Tickets For @Model.Name</h2>
-                        <div class="card-body">
-                        
-                        
-                            <div class="table-responsive" style="overflow-y:auto;height:600px;">
-                                <table class="table table-hover">
-                                    <thead class="">
-                                        <tr>
-                                            @* Table header *@
-                                            <th>Title</th>
-                                            <th>Developer</th>
-                                            <th>Status</th>
-                                            <th>Priority</th>
-                                            <th>Type</th>
-                                            <th>Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (Ticket ticket in Model.Tickets)
-                                        {
+                            <div class="card-body">
+
+
+                                <div class="table-responsive" style="overflow-y:auto;height:600px;">
+                                    <table class="table table-hover">
+                                        <thead class="">
                                             <tr>
-
-                                                <td>@ticket.Title</td>
-                                                @if (ticket.DeveloperUser != null)
-                                                {
-                                                    <td>@ticket.DeveloperUser.FullName</td>
-                                                }
-                                                else
-                                                {
-                                                    <td><a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.Id">Assign Developer</a></td>
-                                                }
-
-                                                <td>@ticket.TicketStatus.Name</td>
-                                                <td>@ticket.TicketPriority.Name</td>
-                                                <td>@ticket.TicketType.Name</td>
-                                                <td>@ticket.Created.ToString("dd/MM/yy")</td>
-                                                <td>
-                                                    <a class="btn btn-primary" asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket.Id">EDIT</a>
-                                                    <a class="btn btn-primary" asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id">DETAILS</a>
-                                                </td>
+                                                @* Table header *@
+                                                <th>Title</th>
+                                                <th>Developer</th>
+                                                <th>Status</th>
+                                                <th>Priority</th>
+                                                <th>Type</th>
+                                                <th>Date</th>
+                                                <th>Action</th>
                                             </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (Ticket ticket in Model.Tickets)
+                                            {
+                                                <tr>
+
+                                                    <td>@ticket.Title</td>
+                                                    @if (ticket.DeveloperUser != null)
+                                                    {
+                                                        <td>@ticket.DeveloperUser.FullName</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+                                                        {
+                                                            <td><a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.Id">Assign Developer</a></td>
+                                                        }
+                                                        else
+                                                        {
+                                                        <td>Not Assigned.</td>
+                                                        }
+                                                    }
+
+                                                    <td>@ticket.TicketStatus.Name</td>
+                                                    <td>@ticket.TicketPriority.Name</td>
+                                                    <td>@ticket.TicketType.Name</td>
+                                                    <td>@ticket.Created.ToString("dd/MM/yy")</td>
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
+                                                    {
+                                                        <td>
+                                                            <a class="btn btn-primary" asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket.Id">EDIT</a>
+                                                            <a class="btn btn-primary" asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id">DETAILS</a>
+                                                        </td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+
+                                                            <a class="btn btn-primary" asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id">DETAILS</a>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+
                             </div>
-                      
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>

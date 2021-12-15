@@ -8,6 +8,7 @@ namespace ShadowTracker.Models.Enums
     public enum BTNotificationTypes
     {
         Ticket,
-        Project
+        Project,
+        Chat
     }
 }

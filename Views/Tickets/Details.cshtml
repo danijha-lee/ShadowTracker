@@ -55,7 +55,7 @@
                                         var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
                                     }
                                     @*Variable from razor logic*@
-                                    <div class="progress-bar" role="progressbar"  aria-valuemin="0" aria-valuemax="100" style="width:@percent;">
+                                    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:@percent;">
                                         @*Variable from razor logic*@
                                         <span class="progress-value">@percent%</span>
                                     </div>
@@ -67,6 +67,22 @@
                         <div class="card-body text-dark">
                             <ul class="list-unstyled">
                                 @*Ticket date*@
+                                @if (Model.DeveloperUser != null)
+                                {
+                                    <li><strong>Developer:</strong> <span class=""> @Model.DeveloperUser?.FullName</span></li>
+                                }
+                                else
+                                {
+                                    if (User.IsInRole("Admin"))
+                                    {
+                                        <li>Devloper:<a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@Model.Id">Assign Developer</a></li>
+                                    }
+                                    else
+                                    {
+                                        <li>Developer: Not Assigned.</li>
+                                    }
+
+                                }
                                 <li><strong>Date Entered:</strong> <span class=""> @Model.Created.ToString("dd/MM/yy")</span></li>
                                 @*Project end date*@
                                 @if (Model.DueDate is not null)
@@ -84,6 +100,16 @@
                                 @*Ticket status*@
                                 <li><strong>Status:</strong> <span class=""> @Model.TicketStatus.Name</span></li>
                             </ul>
+                            @if (Model.Archived == false && User.IsInRole("Admin"))
+                            {
+                                <a class="btn btn-danger btn-sm mt-1" asp-action="Archive" asp-controller="Tickets" asp-route-id="@Model.Id">Archive</a>
+                                <a class="btn btn-warning btn-sm mt-1" asp-action="Edit" asp-controller="Tickets" asp-route-id="@Model.Id">Edit</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-warning btn-sm mt-1" asp-action="Edit" asp-controller="Tickets" asp-route-id="@Model.Id">Edit</a>
+
+                            }
                         </div>
                     </div>
                 </div>
@@ -115,27 +141,38 @@
                                 <h6>Comments</h6>
                                 <ul class="right_chat list-unstyled mb-0">
                                     @*Loop to show comments made for the Ticket*@
-                                    @foreach (TicketComment comment in Model.Comments)
+                                    @if (Model.Comments.Count == 0)
                                     {
-                                        <li class=" mb-4">
-                                            <div class="">
-                                                <a href="javascript:void(0);">
-                                                    @if (btUser?.AvatarFileData != null)
-                                                    {
-                                                        <img class="media-object " src="data:image/*;base64,@(Convert.ToBase64String(btUser.AvatarFileData))" alt=""> }
-                                                    else
-                                                    {
-                                                        <img class="media-object " src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
-                                                </a>
-                                                <div class="">
-                                                    <span class="text-muted" style="font-size:x-small;">
-                                                        @comment.User.FullName
-                                                        <small class="float-right">@comment.Created.ToString("MM.dd.yyyy h:ss tt")</small>:
-                                                    </span>
-                                                </div>
-                                                <span class=" text-primary">@Html.Raw(comment.Comment)</span>
-                                            </div>
+                                        <li>
+                                            <p>No Comments Yet.</p>
                                         </li>
+                                    }
+                                    else
+                                    {
+
+
+                                        @foreach (TicketComment comment in Model.Comments)
+                                        {
+                                            <li class=" mb-4">
+                                                <div class="">
+                                                    <a href="javascript:void(0);">
+                                                        @if (btUser?.AvatarFileData != null)
+                                                        {
+                                                            <img class="media-object " src="data:image/*;base64,@(Convert.ToBase64String(btUser.AvatarFileData))" alt=""> }
+                                                        else
+                                                        {
+                                                            <img class="media-object " src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
+                                                    </a>
+                                                    <div class="">
+                                                        <span class="text-muted" style="font-size:x-small;">
+                                                            @comment.User.FullName
+                                                            <small class="float-right">@comment.Created.ToString("MM.dd.yyyy h:ss tt")</small>:
+                                                        </span>
+                                                    </div>
+                                                    <span class=" text-primary">@Html.Raw(comment.Comment)</span>
+                                                </div>
+                                            </li>
+                                        }
                                     }
                                 </ul>
                             </div>
@@ -180,21 +217,28 @@
                                 <h6>Attachments</h6>
                                 <div class="container">
                                     <div class="row">
-                                        @foreach (TicketAttachment item in Model.Attachments)
+                                        @if (Model.Attachments.Count == 0)
                                         {
-                                            <div class="col col-sm-2">
-                                                <a asp-action="ShowFile" asp-controller="Tickets" asp-route-Id="@item.Id">
-                                                    <div class="icon">
-                                                        <img src="@_fileService.GetFileIcon(item.FileName)" style="height:50px;width:50px" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="@item.FileName" />
+                                            <p>No Attatchments Yet.</p>
+                                        }
+                                        else
+                                        {
+                                            @foreach (TicketAttachment item in Model.Attachments)
+                                            {
+                                                <div class="col col-sm-2">
+                                                    <a asp-action="ShowFile" asp-controller="Tickets" asp-route-Id="@item.Id">
+                                                        <div class="icon">
+                                                            <img src="@_fileService.GetFileIcon(item.FileName)" style="height:50px;width:50px" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="@item.FileName" />
+                                                        </div>
+                                                    </a>
+                                                    <div style="font-size:x-small">
+                                                        <div class="file-name">
+                                                            <strong>@item.Description</strong>
+                                                        </div>
+                                                        <small>Size: @_fileService.FormatFileSize(item.FileData.Length) </small>
                                                     </div>
-                                                </a>
-                                                <div style="font-size:x-small">
-                                                    <div class="file-name">
-                                                        <strong>@item.Description</strong>
-                                                    </div>
-                                                    <small>Size: @_fileService.FormatFileSize(item.FileData.Length) </small>
                                                 </div>
-                                            </div>
+                                            }
                                         }
                                     </div>
                                 </div>
@@ -215,27 +259,34 @@
                         <div class="card-body" style="overflow-y:auto;height:1000px;">
                             @*Loop to show the history entries for the Ticket*@
                             <div class="card-body" style="overflow-y:auto;height:1000px;">
-                                @foreach (TicketHistory history in Model.History)
+                                @if (Model.History.Count == 0)
                                 {
-                                    <div class="">
-                                        <span class="date" style="font-weight:bold">@history.Created.ToString("dd MMM yyyy")</span>
-                                        <h6>@history.Description</h6>
-                                        <span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
+                                    <h6>This Ticket Has No Activity.</h6>
+                                }
+                                else
+                                {
+                                    @foreach (TicketHistory history in Model.History)
+                                    {
                                         <div class="">
-                                            @if (history.Description.Contains("New Ticket Created"))
-                                            {
-                                                <p>A ticket was added.</p> }
-                                            else if (history.Property.Equals("TicketComment") || history.Property.Equals("TicketAttachment"))
-                                            {
-                                                <p>A <b>@history.Property</b>  was added.</p> }
-                                            else
-                                            {
-                                                <p>The ticket <b>@history.Property</b>  was edited</p>
-                                                <p>@($"Previous {history.Property}:  ") <span style="color:red">@history.OldValue</span></p>
-                                                <p>@($"Current {history.Property}:  ") <span style="color:green">@history.NewValue</span></p>}
+                                            <span class="date" style="font-weight:bold">@history.Created.ToString("dd MMM yyyy")</span>
+                                            <h6>@history.Description</h6>
+                                            <span>By: <a href="" title="@history.User.FullName">@history.User.FullName</a></span>
+                                            <div class="">
+                                                @if (history.Description.Contains("New Ticket Created"))
+                                                {
+                                                    <p>A ticket was added.</p> }
+                                                else if (history.Property.Equals("TicketComment") || history.Property.Equals("TicketAttachment"))
+                                                {
+                                                    <p>A <b>@history.Property</b>  was added.</p> }
+                                                else
+                                                {
+                                                    <p>The ticket <b>@history.Property</b>  was edited</p>
+                                                    <p>@($"Previous {history.Property}:  ") <span style="color:red">@history.OldValue</span></p>
+                                                    <p>@($"Current {history.Property}:  ") <span style="color:green">@history.NewValue</span></p>}
+                                            </div>
                                         </div>
-                                    </div>
-                                    <hr />}
+                                        <hr />}
+                                }
                             </div>
                         </div>
                     </div>
