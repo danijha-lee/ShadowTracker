@@ -164,26 +164,26 @@ namespace ShadowTracker.Controllers
                     await _ticketService.AddTicketCommentAsync(ticketComment);
                     await _ticketHistoryService.AddHistoryAsync(ticketComment.TicketId, nameof(TicketComment), ticketComment.UserId);
 
-                    Notification notification = new()
-                    {
-                        TicketId = ticketComment.TicketId,
-                        NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Comment))).Value,
-                        Title = " Ticekt Comment Added",
-                        Message = $"A comment was added to the  : {ticketComment.Ticket.Project.Name} Project, for the ticket {ticketComment.Ticket.Title} by {btUser.FullName}",
-                        SenderId = btUser.Id,
-                    };
+                    //Notification notification = new()
+                    //{
+                    //    TicketId = ticketComment.TicketId,
+                    //    NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Comment))).Value,
+                    //    Title = " Ticekt Comment Added",
+                    //    Message = $"A comment was added to the  : {ticketComment.Ticket.Project.Name} Project, for the ticket {ticketComment.Ticket.Title} by {btUser.FullName}",
+                    //    SenderId = btUser.Id,
+                    //};
 
-                    List<BTUser> members = new();
-                    members.Add(ticketComment.Ticket.DeveloperUser);
-                    members.Add(ticketComment.Ticket.OwnerUser);
+                    //List<BTUser> members = new();
+                    //members.Add(ticketComment.Ticket.DeveloperUser);
+                    //members.Add(ticketComment.Ticket.OwnerUser);
 
-                    await _notificationService.AddNotificationAsync(notification);
-                    await _notificationService.SendMembersEmailNotificationsAsync(notification, members);
-                    BTUser projectManager = await _projectService.GetProjectManagerAsync(ticketComment.Ticket.ProjectId);
-                    if (projectManager != null)
-                    {
-                        await _notificationService.SendEmailNotificationsByRoleAsync(notification, companyId, nameof(BTRoles.ProjectManager));
-                    }
+                    //await _notificationService.AddNotificationAsync(notification);
+                    //await _notificationService.SendMembersEmailNotificationsAsync(notification, members);
+                    //BTUser projectManager = await _projectService.GetProjectManagerAsync(ticketComment.Ticket.ProjectId);
+                    //if (projectManager != null)
+                    //{
+                    //    await _notificationService.SendEmailNotificationsByRoleAsync(notification, companyId, nameof(BTRoles.ProjectManager));
+                    //}
 
                     return RedirectToAction(nameof(Details), new { id = ticketComment.TicketId });
                 }
