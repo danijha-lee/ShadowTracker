@@ -16,6 +16,7 @@ namespace ShadowTracker.Data
 
         public virtual DbSet<Company> Companies { get; set; }
         public virtual DbSet<Invite> Invites { get; set; }
+        public virtual DbSet<ToDo> ToDos { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<NotificationType> NotificationTypes { get; set; }
         public virtual DbSet<Project> Projects { get; set; }

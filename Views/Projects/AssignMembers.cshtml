@@ -1,6 +1,6 @@
 ﻿@model ShadowTracker.Models.ViewModels.ProjectMembersViewModel
 <div class="container">
-    <h2>Assign Members for</h2>
+    
     <div class="row">
         <div class="col-md-6">
             <h3> @Model.Project.Name</h3>
@@ -13,8 +13,8 @@
                         <input hidden asp-for="Project.Id" />
                         <div class="col-12 mb-3">
                             <div class="form-group">
-                                <select required asp-for="@Model.SelectedUsers"  asp-items="@Model.Members" class="js-example-placeholder-multiple col-sm-6" multiple="multiple">
-\                                <option>Choose..</option>
+                                <select  asp-for="@Model.SelectedUsers"  asp-items="@Model.Members" class="js-example-basic-multiple select2" multiple="multiple">
+\                               
                                 </select>
                             </div>
                         </div>

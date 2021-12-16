@@ -1,11 +1,11 @@
-﻿@model ShadowTracker.Models.Notification
+﻿@model IEnumerable<ShadowTracker.Models.Notification>
 @using ShadowTracker.Services.Interfaces
 @using Microsoft.AspNetCore.Identity;
 @inject IBTNotificationService _notificationService
 @inject UserManager<BTUser> _userManager
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Index";
     BTUser user = await _userManager.GetUserAsync(User);
     List<Notification> sent = await _notificationService.GetSentNotificationsAsync(user.Id);
     List<Notification> received = await _notificationService.GetReceivedNotificationsAsync(user.Id);
@@ -62,58 +62,55 @@
                 <div class="email-right-aside">
                     <div class="card email-body">
                         <div class="email-profile">
-                            <div class="email-right-aside">
-                                <div class="email-body">
-                                    <div class="email-content">
-                                        <div class="email-top">
-                                            <div class="row">
-                                                <div class="col-xl-12">
-                                                    <div class="media">
-                                                        <img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt="">
-                                                        <div class="media-body">
-                                                            <h6 class="d-block">@Model.Sender.FullName                                                             </h6>
-                                                            <p>@Model.Created.ToString("ddd. MMM, yyyy ")</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="email-wrapper">
-                                            <div class="emailread-group">
-                                                <div class="read-group">
-                                                </div>
-                                                <div class="read-group">
-                                                    <h5>@Model.Title</h5>
-                                                    <p>@Model.Message</p>
-                                                </div>
-                                            </div>
-                                            @*<div class="emailread-group">
+                            <div>
+                                <div class="pe-0 b-r-light"></div>
+                                <div class="email-top">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="media">
 
-                                                    <h6 class="text-muted mb-0"><i class="icofont icofont-clip"></i> ATTACHMENTS</h6><a class="text-muted text-end right-download font-primary f-w-600" href="#"><i class="fa fa-long-arrow-down me-2"></i>Download All</a>
-                                                    <div class="clearfix"></div>
-                                                    <div class="attachment">
-                                                        <ul>
-                                                            <li><img class="img-fluid" src="../assets/images/email/1.jpg" alt=""></li>
-                                                            <li><img class="img-fluid" src="../assets/images/email/2.jpg" alt=""></li>
-                                                            <li><img class="img-fluid" src="../assets/images/email/3.jpg" alt=""></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>*@
-                                            <div class="emailread-group">
-                                                <form asp-action="SendNotification" method="post">
-                                                    <input hidden name="RecipientId" value="@Model.SenderId" />
-                                                    <label>Subject:</label>
-                                                    <input class="form-control" name="Title" placeholder="Re: @Model.Title" />
-                                                    <textarea class="form-control" rows="4" cols="50" name="Message" placeholder="Message..."></textarea>
-                                                    <div class="action-wrapper">
-                                                        <ul class="actions">
-                                                            <button type="submit" class="btn btn-primary" href="javascript:void(0)"><i class="fa fa-reply me-2"></i>Reply</button>
-                                                        </ul>
-                                                    </div>
-                                                </form>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="inbox">
+                                    @if (sent.Count == 0)
+                                    {
+                                        <div class="media-body text-center">
+
+                                            <p class="text-center p-5">No Notifications Yet.</p>
+                                        </div>
+                                    }
+                                    @foreach (Notification notification in  sent)
+                                    {
+                                        <div class="media">
+                                            <div class="media-size-email">
+                                                <label class="d-block mb-0" for="chk-ani">
+
+                                                </label>
+                                                @if (notification.Sender.AvatarFileData != null)
+                                                {
+                                                    <img class="me-3 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(notification.Sender.AvatarFileData))" width="32" height="32" alt="...">
+                                                }
+                                                else
+                                                {
+
+
+                                                    <img class="me-3 rounded-circle" src="/assets/images/user/user.png" alt="">
+                                                }
+
+                                            </div>
+                                            <a asp-action="SentDetails" asp-controller="Notifications" asp-route-id="@notification.Id">
+                                                <div class="media-body mb-5">
+
+                                                    <h6>@notification.Sender.FullName </h6>
+                                                    &emsp;<div class="text-black-50"> @notification.Title</div><span>@notification.Created.ToString("ddd. MMM dd")</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <hr class="mt-1 mb-1" />
+                                    }
+
                                 </div>
                             </div>
                         </div>

@@ -23,7 +23,7 @@
                             <div class="card-body">
                                 <div class="email-app-sidebar">
                                     <div class="media">
-                                        <div class="media-size-email">
+                                        < <div class="media-size-email">
                                             @if (user.AvatarFileData != null)
                                             {
                                                 <img class="me-3 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(user.AvatarFileData))" width="64" height="64" alt="...">
@@ -48,9 +48,6 @@
                                         @*<li><a href="#"><span class="title"><i class="icon-pencil-alt"></i> DRAFT</span><span class="badge pull-right">(59)</span></a></li>
                                             <li><a href="#"><span class="title"><i class="icon-trash"></i> TRASH</span><span class="badge pull-right">(99)</span></a></li>*@
                                         @*<li><a href="#"><span class="title"><i class="icon-info-alt"></i> IMPORTANT</span></a></li>*@
-
-
-
                                     </ul>
                                 </div>
                             </div>
@@ -99,19 +96,6 @@
                                                         </ul>
                                                     </div>
                                                 </div>*@
-                                            <div class="emailread-group">
-                                                <form asp-action="SendNotification" method="post">
-                                                    <input hidden name="RecipientId" value="@Model.SenderId" />
-                                                    <label>Subject:</label>
-                                                    <input class="form-control" name="Title" placeholder="Re: @Model.Title" />
-                                                    <textarea class="form-control" rows="4" cols="50" name="Message" placeholder="Message..."></textarea>
-                                                    <div class="action-wrapper">
-                                                        <ul class="actions">
-                                                            <button type="submit" class="btn btn-primary" href="javascript:void(0)"><i class="fa fa-reply me-2"></i>Reply</button>
-                                                        </ul>
-                                                    </div>
-                                                </form>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -13,6 +13,7 @@
 }
 
 <div>
+    <a class="btn btn-secondary" asp-action="Create" asp-controller="Tickets">Add Ticket</a>
     <div class="container-fluid text-dark">
         <div class="row gy-5">
             <div class="col-md-12 col">
@@ -81,7 +82,7 @@
                             <hr />
                             @if (User.IsInRole("Admin"))
                             {
-                                <a class="btn btn-warning btn-sm " asp-action="AssignPm" asp-controller="Projects">Edit</a>
+                                <a class="btn btn-warning btn-sm " asp-action="AssignPm" asp-controller="Projects">Assign</a>
                             }
                         </div>
                         <div class="card-body" style="overflow-y:auto;height:300px;">
@@ -227,6 +228,7 @@
                             </div>
                             <div class="body vertical-scroll scroll-bar-wrap" style="overflow-y:auto;height:300px; ">
                                 @* Project Activity loop *@
+
                                 @foreach (TicketHistory history in await _ticketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, btUser.CompanyId))
                                 {
                                     <div class="">
@@ -267,6 +269,15 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            @if (Model.Tickets.Count == 0)
+                                            {
+                                                <tr>
+                                                    <td colspan="7" class="text-center">
+                                                        <p>No Tickets Yet.  &emsp; <a class="btn btn-secondary btn-sm" asp-action="Create" asp-controller="Tickets"> Add Ticket</a></p>
+                                                    </td> 
+                                                </tr>
+                                                
+                                            }
                                             @foreach (Ticket ticket in Model.Tickets)
                                             {
                                                 <tr>
@@ -284,7 +295,7 @@
                                                         }
                                                         else
                                                         {
-                                                        <td>Not Assigned.</td>
+                                                            <td>Not Assigned.</td>
                                                         }
                                                     }
 
@@ -295,8 +306,8 @@
                                                     @if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
                                                     {
                                                         <td>
-                                                            <a class="btn btn-primary" asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket.Id">EDIT</a>
-                                                            <a class="btn btn-primary" asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id">DETAILS</a>
+                                                            <a class="btn btn-primary btn-sm" asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket.Id"><i class="icon-pencil"></i></a>
+                                                            <a class="btn btn-success" asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id"><i class="icon-eye"></i></a>
                                                         </td>
                                                     }
                                                     else

@@ -72,6 +72,28 @@ namespace ShadowTracker.Controllers
             return View(notification);
         }
 
+        public async Task<IActionResult> SentDetails(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var notification = await _context.Notifications
+                .Include(n => n.NotificationType)
+                .Include(n => n.Project)
+                .Include(n => n.Recipient)
+                .Include(n => n.Sender)
+                .Include(n => n.Ticket)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (notification == null)
+            {
+                return NotFound();
+            }
+
+            return View(notification);
+        }
+
         // GET: Notifications/Create
         public async Task<IActionResult> Create()
         {
@@ -131,6 +153,15 @@ namespace ShadowTracker.Controllers
             ViewData["SenderId"] = new SelectList(_context.Users, "Id", "Id", notification.SenderId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", notification.TicketId);
             return View(notification);
+        }
+
+        //GET: Notificaitons/ Sent
+
+        public async Task<IActionResult> Sent()
+        {
+            string userId = _userManager.GetUserId(User);
+            List<Notification> notifications = await _notificationService.GetSentNotificationsAsync(userId);
+            return View(notifications);
         }
 
         // GET: Notifications/Edit/5

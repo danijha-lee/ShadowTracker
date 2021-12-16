@@ -123,12 +123,22 @@ namespace ShadowTracker.Controllers
                     if (!string.IsNullOrEmpty(model.PmId))
                     {
                         await _projectService.AddProjectManagerAsync(model.PmId, model.Project.Id);
+                        Notification notification1 = new()
+                        {
+                            TicketId = model.Project.Id,
+                            NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.UserAdded))).Value,
+                            Title = "Ticket Assigned",
+                            Message = $"Project : {model.Project.Name}, was assigned by {btUser.FullName}",
+                            SenderId = btUser.Id,
+                        };
+                        await _notificationService.AddNotificationAsync(notification1);
+                        await _notificationService.SendEmailNotificationsByRoleAsync(notification1, companyId, nameof(BTRoles.ProjectManager));
                     }
 
                     Notification notification = new()
                     {
                         TicketId = model.Project.Id,
-                        NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Project))).Value,
+                        NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.UserAdded))).Value,
                         Title = "Ticket Assigned",
                         Message = $"Project : {model.Project.Name}, was assigned by {btUser.FullName}",
                         SenderId = btUser.Id,
@@ -244,9 +254,21 @@ namespace ShadowTracker.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignPM(AssignPMViewModel model)
         {
+            BTUser btUser = await _userManager.GetUserAsync(User);
+            int companyId = User.Identity.GetCompanyId().Value;
             if (!string.IsNullOrEmpty(model.PMID))
             {
                 await _projectService.AddProjectManagerAsync(model.PMID, model.Project.Id);
+                Notification notification2 = new()
+                {
+                    TicketId = model.Project.Id,
+                    NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.UserAdded))).Value,
+                    Title = "Ticket Assigned",
+                    Message = $"Project : {model.Project.Name}, was assigned by {btUser.FullName}",
+                    SenderId = btUser.Id,
+                };
+                await _notificationService.AddNotificationAsync(notification2);
+                await _notificationService.SendEmailNotificationsByRoleAsync(notification2, companyId, nameof(BTRoles.ProjectManager));
                 return RedirectToAction(nameof(Details), new { id = model.Project.Id });
             }
             return RedirectToAction(nameof(AssignPM), new { projectId = model.Project.Id });
@@ -278,7 +300,17 @@ namespace ShadowTracker.Controllers
         {
             if (model.SelectedUsers != null)
             {
+                BTUser btUser = await _userManager.GetUserAsync(User);
+                int companyId = User.Identity.GetCompanyId().Value;
                 List<string> memberIds = (await _projectService.GetAllProjectMembersExceptPMAsync(model.Project.Id)).Select(p => p.Id).ToList();
+                Notification notification = new()
+                {
+                    TicketId = model.Project.Id,
+                    NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.UserAdded))).Value,
+                    Title = "Project Assigned",
+                    Message = $"Project : {model.Project.Name}, was assigned by {btUser.FullName}",
+                    SenderId = btUser.Id,
+                };
 
                 foreach (string member in memberIds)
                 {
@@ -288,7 +320,11 @@ namespace ShadowTracker.Controllers
                 foreach (string member in model.SelectedUsers)
                 {
                     await _projectService.AddUserToProjectAsync(member, model.Project.Id);
+
+                    notification.RecipientId = member;
+                    await _notificationService.AddNotificationAsync(notification);
                 }
+
                 return RedirectToAction(nameof(Details), new { id = model.Project.Id });
             }
             return RedirectToAction(nameof(AssignMembers), new { projectId = model.Project.Id });

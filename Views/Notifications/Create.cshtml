@@ -1,7 +1,15 @@
 ﻿@model ShadowTracker.Models.Notification
+@using ShadowTracker.Services.Interfaces
+@using Microsoft.AspNetCore.Identity;
+@inject IBTNotificationService _notificationService
+@inject UserManager<BTUser> _userManager
+
 
 @{
     ViewData["Title"] = "Create";
+    BTUser user = await _userManager.GetUserAsync(User);
+    List<Notification> sent = await _notificationService.GetSentNotificationsAsync(user.Id);
+    List<Notification> notifications = await _notificationService.GetReceivedNotificationsAsync(user.Id);
 }
 
 <!-- Container-fluid starts-->
@@ -16,30 +24,34 @@
                             <div class="card-body">
                                 <div class="email-app-sidebar">
                                     <div class="media">
-                                        <div class="media-size-email"><img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt=""></div>
+                                        <div class="media-size-email">
+                                            @if (user.AvatarFileData != null)
+                                            {
+                                                <img class="me-3 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(user.AvatarFileData))" width="64" height="64" alt="...">
+                                            }
+                                            else
+                                            {
+
+
+                                                <img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt="">
+                                            }
+                                        </div>
                                         <div class="media-body">
-                                            <h6 class="f-w-600">MARKJENCO</h6>
-                                            <p>Markjecno@gmail.com</p>
+                                            <h6 class="f-w-600">@user.FullName</h6>
+                                            <p>@user.Email</p>
                                         </div>
                                     </div>
                                     <ul class="nav main-menu" role="tablist">
-                                        <li class="nav-item"><a class="btn-primary btn-block btn-mail" id="pills-darkhome-tab" data-bs-toggle="pill" href="#pills-darkhome"><i class="icofont icofont-envelope me-2"></i> NEW MAIL</a></li>
-                                        <li class="nav-item"><a class="show" id="pills-darkprofile-tab" data-bs-toggle="pill" href="email_inbox.html"><span class="title"><i class="icon-import"></i> Inbox</span><span class="badge pull-right">(236)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-folder"></i> All mail</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-new-window"></i> Sent</span><span class="badge pull-right">(69)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-pencil-alt"></i> DRAFT</span><span class="badge pull-right">(59)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-trash"></i> TRASH</span><span class="badge pull-right">(99)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-info-alt"></i> IMPORTANT</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-star"></i> Starred</span></a></li>
-                                        <li>
-                                            <hr>
-                                        </li>
-                                        <li><a href="#"><span class="title"><i class="icon-email"></i> UNREAD</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-export"></i> SPAM</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-share"></i> OUTBOX</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-file"></i> UPDATE</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-bell"></i> ALERT</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-notepad"></i> NOTES</span><span class="badge pull-right">(20)</span></a></li>
+                                        <li class="nav-item"><a class="btn-primary btn-block btn-mail w-100" asp-action="Create" asp-controller="Notifications" role="tab" aria-controls="pills-darkhome" aria-selected="true"><i class="icofont icofont-envelope me-2"></i> NEW MESSAGE</a></li>
+                                        <li class="nav-item"><a class="show" asp-action="Index" asp-controller="Notifications"><span class="title"><i class="icon-import"></i> Inbox</span><span class="badge pull-right">(@notifications.Count())</span></a></li>
+
+                                        <li><a asp-action="Sent" asp-controller="Notifications"><span class="title"><i class="icon-new-window"></i> Sent</span><span class="badge pull-right">(@sent.Count())</span></a></li>
+                                        @*<li><a href="#"><span class="title"><i class="icon-pencil-alt"></i> DRAFT</span><span class="badge pull-right">(59)</span></a></li>
+                                            <li><a href="#"><span class="title"><i class="icon-trash"></i> TRASH</span><span class="badge pull-right">(99)</span></a></li>*@
+                                        @*<li><a href="#"><span class="title"><i class="icon-info-alt"></i> IMPORTANT</span></a></li>*@
+
+
+
                                     </ul>
                                 </div>
                             </div>
@@ -56,7 +68,7 @@
                                     <div class="email-top compose-border">
                                         <div class="compose-header">
                                             <h4 class="mb-0">New Message</h4>
-                                            <button class="btn btn-primary" type="button"><i class="fa fa-file me-2"></i> save</button>
+                                            @*<button class="btn btn-primary" type="button"><i class="fa fa-file me-2"></i> save</button>*@
                                         </div>
                                     </div>
                                     <div class="email-wrapper">
@@ -75,20 +87,18 @@
                                                 <label>Message</label>
                                                 <textarea id="text-box" asp-for="Message" cols="150" rows="10">                                                            </textarea>
                                             </div>
-                                            <div class="form-group">
+                                           @* <div class="form-group">
                                                 <div class="dropzone digits text-center" id="singleFileUpload" action="/upload.php">
                                                     <div class="dz-message needsclick">
                                                         <i class="icon-cloud-up"></i>
                                                         <h6>Drop files here or click to upload.</h6><span class="note needsclick">(This is just a demo dropzone. Selected files are <strong>not</strong> actually uploaded.)</span>
                                                     </div>
                                                 </div>
-                                            </div>
-                                                <button type="submit" class="btn btn-secondary"><i class="fa fa-paper-plane me-2"></i>send                                                   </button>
+                                            </div>*@
+                                            <button type="submit" class="btn btn-secondary"><i class="fa fa-paper-plane me-2"></i>send                                                   </button>
                                         </form>
                                         <div class="action-wrapper">
-                                            <ul class="actions">
-                                                <li><a class="btn btn-danger" href="javascript:void(0)">                                                      <i class="fa fa-times me-2"></i>cancel</a></li>
-                                            </ul>
+                                           
                                         </div>
                                     </div>
                                 </div>

@@ -86,6 +86,9 @@ namespace ShadowTracker.Data
                                                     new NotificationType() { Name = BTNotificationTypes.Project.ToString() },
                                                     new NotificationType() { Name = BTNotificationTypes.Ticket.ToString() },
                                                     new NotificationType() { Name = BTNotificationTypes.Chat.ToString() },
+                                                    new NotificationType() { Name = BTNotificationTypes.Comment.ToString() },
+                                                    new NotificationType() { Name = BTNotificationTypes.UserAdded.ToString() },
+                                                    new NotificationType() { Name = BTNotificationTypes.Attachment.ToString() },
                 };
 
                 var dbNotificationTypes = context.NotificationTypes.Select(c => c.Name).ToList();

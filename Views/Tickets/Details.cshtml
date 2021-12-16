@@ -18,19 +18,6 @@
 }
 
 
-@if (!string.IsNullOrEmpty(Model.DeveloperUserId))
-{
-    <a href="javascript:void(0);">
-        @if (Model.DeveloperUser?.AvatarFileData != null)
-        {
-            <img class="media-object " src="data:image/*;base64,@(Convert.ToBase64String(btUser.AvatarFileData))" alt=""> }
-        else
-        {
-            <img class="media-object " src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
-    </a>
-    <span class="text-muted text-dark" style="font-size:x-small;">
-        Developer:  <strong>@Model.DeveloperUser.FullName</strong>
-    </span>}
 
 <div>
     <div classxfont-weighteighteightgetainer-fluid">
@@ -158,10 +145,10 @@
                                                     <a href="javascript:void(0);">
                                                         @if (btUser?.AvatarFileData != null)
                                                         {
-                                                            <img class="media-object " src="data:image/*;base64,@(Convert.ToBase64String(btUser.AvatarFileData))" alt=""> }
+                                                            <img class="media-object img-fluid rounded-circle me-3 " width="32" height="32" src="data:image/*;base64,@(Convert.ToBase64String(btUser.AvatarFileData))" alt=""> }
                                                         else
                                                         {
-                                                            <img class="media-object " src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
+                                                            <img class="media-object img-fluid rounded-circle me-3 " width="32" height="32" src="https://cdn.icon-icons.com/icons2/1378/PNG/512/avatardefault_92824.png" alt="" style="width:30px;height:30px">}
                                                     </a>
                                                     <div class="">
                                                         <span class="text-muted" style="font-size:x-small;">
@@ -214,37 +201,48 @@
 
                                 @* Ticket attachments part 2 here *@
                                 <hr />
-                                <h6>Attachments</h6>
-                                <div class="container">
-                                    <div class="row">
+                                <h6 id="attachments">Attachments</h6>
+                                
+                                    <div class="card-body file-manager">
                                         @if (Model.Attachments.Count == 0)
                                         {
                                             <p>No Attatchments Yet.</p>
                                         }
                                         else
                                         {
+                                    <ul class="files">
                                             @foreach (TicketAttachment item in Model.Attachments)
                                             {
-                                                <div class="col col-sm-2">
-                                                    <a asp-action="ShowFile" asp-controller="Tickets" asp-route-Id="@item.Id">
-                                                        <div class="icon">
-                                                            <img src="@_fileService.GetFileIcon(item.FileName)" style="height:50px;width:50px" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="@item.FileName" />
-                                                        </div>
-                                                    </a>
-                                                    <div style="font-size:x-small">
-                                                        <div class="file-name">
-                                                            <strong>@item.Description</strong>
-                                                        </div>
-                                                        <small>Size: @_fileService.FormatFileSize(item.FileData.Length) </small>
-                                                    </div>
-                                                </div>
-                                            }
+                                        <li class="file-box">
+                                        <a asp-action="ShowFile" asp-controller="Tickets" asp-route-Id="@item.Id">
+                                            <div class="file-top">  <i class="fa fa-file-image-o txt-primary" width="200" height="200"></i><i class="fa fa-ellipsis-v f-14 ellips"></i></div>
+                                        </a>
+                                            <div class="file-bottom">
+                                                <h6>@item.Description </h6>
+                                                <p class="mb-1"> @_fileService.FormatFileSize(item.FileData.Length)</p>
+                                               
+                                            </div>
+                                        </li>
+                                    @*<div class="col col-sm-2">
+                                            <div class="icon">
+                                                <img src="@_fileService.GetFileIcon(item.FileName)" style="height:50px;width:50px" data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="@item.FileName" />
+                                            </div>
+                                        <div style="font-size:x-small">
+                                            <div class="file-name">
+                                                <strong>@item.Description</strong>
+                                            </div>
+                                            <small>Size: @_fileService.FormatFileSize(item.FileData.Length) </small>
+                                        </div>
+                                    </div>*@
+
+
+                                }
+                                    </ul>
                                         }
                                     </div>
-                                </div>
+                                
                             </div>
-                            <div class="card-footer">
-                            </div>
+                            
                         </div>
                     </div>
                 </div>

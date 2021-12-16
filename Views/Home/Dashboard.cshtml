@@ -4,6 +4,7 @@
 @using X.PagedList
 @using X.PagedList.Mvc.Core
 @using X.PagedList.Web.Common
+@using ShadowTracker.Models.Enums
 
 @inject IBTTicketService _ticketServie
 @inject IBTTicketHistoryService _ticketHistoryService
@@ -140,7 +141,7 @@
                             </div>
                         }
                     </div>
-                    <div  @*class="pagination-layout1"*@>
+                    <div @*class="pagination-layout1"*@>
                         @Html.PagedListPager(Model.Members, page => Url.Action("Dashboard", new { page = page }),
                     new PagedListRenderOptions
                     {
@@ -174,15 +175,76 @@
                 </div>
 
             }
-            @foreach (Project project in Model.Projects.Take(1))
+            else
+           if (Model.Projects.Count == 1)
             {
-                @*Progress bar logic*@
+                @foreach (Project project in Model.Projects.Take(1))
+                {
+                    @*Progress bar logic*@
 
                 var start = project.StartDate.Value;
                 var end = project.EndDate.Value;
                 var today = DateTime.Now;
                 var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
-                <div class="col">
+                    <div class="col-12">
+                        <div class="card social-widget-card">
+                            <div class="card-body">
+                                <div class="redial-social-widget radial-bar-70" data-label="@percent%"><i class="fa fa-clipboard font-primary"></i></div>
+                                <h5 class="b-b-light">@project.Name</h5>
+                                <div class="row">
+                                    <div class="col text-center b-r-light">
+                                        <span>Tickets</span>
+                                        <h4 class="counter mb-0">@project.Tickets.Count</h4>
+                                    </div>
+                                    <div class="col text-center">
+                                        <span>Memebers</span>
+                                        <h4 class="counter mb-0">@project.Members.Count</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+            }
+            else if (Model.Projects.Count == 2)
+            {
+                @foreach (Project project in Model.Projects.Take(2))
+                {
+                    @*Progress bar logic*@
+
+                var start = project.StartDate.Value;
+                var end = project.EndDate.Value;
+                var today = DateTime.Now;
+                var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+                    <div class="col-6">
+                        <div class="card social-widget-card">
+                            <div class="card-body">
+                                <div class="redial-social-widget radial-bar-70" data-label="@percent%"><i class="fa fa-clipboard font-primary"></i></div>
+                                <h5 class="b-b-light">@project.Name</h5>
+                                <div class="row">
+                                    <div class="col text-center b-r-light">
+                                        <span>Tickets</span>
+                                        <h4 class="counter mb-0">@project.Tickets.Count</h4>
+                                    </div>
+                                    <div class="col text-center">
+                                        <span>Memebers</span>
+                                        <h4 class="counter mb-0">@project.Members.Count</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>}
+            }
+            else
+            {
+            @foreach (Project project in Model.Projects.Take(3))
+            {
+                @*Progress bar logic*@
+
+            var start = project.StartDate.Value;
+            var end = project.EndDate.Value;
+            var today = DateTime.Now;
+            var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+                <div class="col-4">
                     <div class="card social-widget-card">
                         <div class="card-body">
                             <div class="redial-social-widget radial-bar-70" data-label="@percent%"><i class="fa fa-clipboard font-primary"></i></div>
@@ -200,87 +262,10 @@
                         </div>
                     </div>
                 </div>}
-            @foreach (Project project1 in Model.Projects.Skip(1).Take(1))
-            {
-                @*Progress bar logic*@
-
-                var start = project1.StartDate.Value;
-                var end = project1.EndDate.Value;
-                var today = DateTime.Now;
-                var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
-                <div class="col">
-                    <div class="card social-widget-card">
-                        <div class="card-body">
-                            <div class="redial-social-widget radial-bar-70" data-label="@percent"><i class="fa fa-clipboard font-primary"></i></div>
-                            <h5 class="b-b-light">@project1.Name</h5>
-                            <div class="row">
-                                <div class="col text-center b-r-light">
-                                    <span>Tickets</span>
-                                    <h4 class="counter mb-0">@project1.Tickets.Count</h4>
-                                </div>
-                                <div class="col text-center">
-                                    <span>Members</span>
-                                    <h4 class="counter mb-0">@project1.Members.Count</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             }
-            @foreach (Project project2 in Model.Projects.Skip(2).Take(1))
-            {
-                @*Progress bar logic*@
 
-                var start = project2.StartDate.Value;
-                var end = project2.EndDate.Value;
-                var today = DateTime.Now;
-                var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
-                <div class="col">
-                    <div class="card social-widget-card">
-                        <div class="card-body">
-                            <div class="redial-social-widget radial-bar-70" data-label="@percent"><i class="fa fa-clipboard font-primary"></i></div>
-                            <h5 class="b-b-light">@project2.Name</h5>
-                            <div class="row">
-                                <div class="col text-center b-r-light">
-                                    <span>Tickets</span>
-                                    <h4 class="counter mb-0">@project2.Tickets.Count</h4>
-                                </div>
-                                <div class="col text-center">
-                                    <span>Members</span>
-                                    <h4 class="counter mb-0">@project2.Members.Count</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-            @foreach (Project project3 in Model.Projects.Skip(3).Take(1))
-            {
-                @*Progress bar logic*@
 
-                var start = project3.StartDate.Value;
-                var end = project3.EndDate.Value;
-                var today = DateTime.Now;
-                var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
-                <div class="col">
-                    <div class="card social-widget-card">
-                        <div class="card-body">
-                            <div class="redial-social-widget radial-bar-70" data-label="@percent"><i class="fa fa-clipboard font-primary"></i></div>
-                            <h5 class="b-b-light">@project3.Name</h5>
-                            <div class="row">
-                                <div class="col text-center b-r-light">
-                                    <span>Tickets</span>
-                                    <h4 class="counter mb-0">@project3.Tickets.Count</h4>
-                                </div>
-                                <div class="col text-center">
-                                    <span>Members</span>
-                                    <h4 class="counter mb-0">@project3.Members.Count</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
+
             <div class="col-xl-8 box-col-8">
                 <div class="card">
                     <div class="card-header">
@@ -315,7 +300,7 @@
                                 {
                                     <tr>
 
-                                        <td>@ticket.Title</td>
+                                        <td><a asp-action="Details" asp-controller="Tickets" asp-route-id="@ticket.Id">@ticket.Title</a></td>
                                         @if (ticket.DeveloperUser != null)
                                         {
                                             <td>@ticket.DeveloperUser.FullName</td>
@@ -323,14 +308,32 @@
                                         else if (User.IsInRole("Admin") || User.IsInRole("ProjectManager"))
 
                                         {
-                                            <td><a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.ProjectId">Assign Developer</a></td>
+                                            <td><a class=" btn btn-warning btn-sm" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.ProjectId"><i class="icon-user"></i>&emsp;Assign Developer</a></td>
                                         }
                                         else
                                         {
                                             <td>Not Assigned</td>
                                         }
+                                        @if (ticket.TicketStatus.Name == nameof(BTTicketStatus.New))
+                                        {
 
-                                        <td>@ticket.TicketStatus.Name</td>
+                                            <td class=" text-dark badge bg-primary badge-primary">@ticket.TicketStatus.Name</td>
+                                        }
+                                        else if (ticket.TicketStatus.Name == nameof(BTTicketStatus.Testing))
+                                        {
+
+                                            <td class="badge badge-warning bg-warning">@ticket.TicketStatus.Name</td>
+                                        }
+                                        else if (ticket.TicketStatus.Name == nameof(BTTicketStatus.Development))
+                                        {
+
+                                            <td class=" badge badge-danger bg-danger">@ticket.TicketStatus.Name</td>
+                                        }
+                                        else
+                                        {
+
+                                            <td class="badge badge-success bg-success">@ticket.TicketStatus.Name</td>
+                                        }
                                         <td>@ticket.TicketPriority.Name</td>
                                         <td>@ticket.TicketType.Name</td>
                                         <td>@ticket.Created.ToString("dd/MM/yy")</td>

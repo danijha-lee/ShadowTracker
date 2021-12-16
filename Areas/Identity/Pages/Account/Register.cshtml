@@ -15,7 +15,7 @@
     <meta name="keywords" content="admin template, viho admin template, dashboard template, flat admin template, responsive admin template, web app">
     <meta name="author" content="pixelstrap">
     <link rel="icon" href="/assets/images/favicon.png" type="image/x-icon">
-    <link rel="shortcut icon" href="/assets/images/favicon.png" type="image/x-icon">
+    <link rel="shortcut icon" href="~/img/favicon-32x32.png" type="image/x-icon">
     <title>Archer | The Ultimate Issue Tracker</title>
     <!-- Google font-->
     <link rel="preconnect" href="https://fonts.gstatic.com">
@@ -111,18 +111,16 @@
                                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                                 </div>
                             </div>
-                            @*<div class="form-group">
-                                    <div class="checkbox">
-                                        <input id="checkbox1" type="checkbox">
-                                        <label class="text-muted" for="checkbox1">Agree with <span>Privacy Policy  </span></label>
-                                    </div>
-                                </div>*@
+                          
                             <div class="form-group mb-3">
                                 <button class="btn btn-primary btn-block" type="submit">Create Account</button>
                             </div>
 
-                            <p>Already have an account?<a class="ms-2" asp-page="/Account/Login" asp-area="Identity">Sign in</a></p>
+                            <p class="mb-2">Already have an account?<a class="ms-2" asp-page="/Account/Login" asp-area="Identity">Sign in</a></p>
+                            <hr />
+                        <div class="logo-wrapper text-center"><img class="img-fluid" src="~/Img/ArcherNavLogo.png" alt="App Logo"></div>
                         </form>
+
                     </div>
                 </div>
             </div>

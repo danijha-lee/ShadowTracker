@@ -9,6 +9,9 @@ namespace ShadowTracker.Models.Enums
     {
         Ticket,
         Project,
-        Chat
+        Chat,
+        Comment,
+        Attachment,
+        UserAdded
     }
 }

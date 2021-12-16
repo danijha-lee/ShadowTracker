@@ -10,7 +10,6 @@
 @inject UserManager<BTUser> _userManager
 @inject IBTLookupService _lookupService
 
-
 @{
     ViewData["Title"] = "All Tickets";
     BTUser user = await _userManager.GetUserAsync(User);
@@ -19,7 +18,7 @@
 
 }
 
-
+<link rel="stylesheet" href="//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
 <!-- Container-fluid starts-->
 <div class="container-fluid">
     <div class="email-wrap bookmark-wrap">
@@ -32,7 +31,18 @@
                             <div class="card-body">
                                 <div class="email-app-sidebar left-bookmark">
                                     <div class="media">
-                                        <div class="media-size-email"><img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt=""></div>
+                                        <div class="media-size-email">
+                                            @if (user.AvatarFileData != null)
+                                            {
+                                                <img class="me-3 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(user.AvatarFileData))" width="64" height="64" alt="...">
+                                            }
+                                            else
+                                            {
+
+
+                                                <img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt="">
+                                            }
+                                        </div>
                                         <div class="media-body">
                                             <h6 class="f-w-600">@user.FullName</h6>
                                             <p>@user.Email</p>
@@ -146,16 +156,25 @@
                                         <div class="card-body p-0">
                                             <div class="taskadd">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="allTickets">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
                                                         @if (Model.Tickets.Count == 0)
                                                         {
-                                                            <div class="card-body">
-                                                                <div class="details-bookmark text-center">
-                                                                    <div class="row" id="favouriteData"></div>
-                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                                </div>
-                                                            </div>
-
+                                                            <tr>
+                                                                <td class="card-body" colspan="3">
+                                                                    <div class="details-bookmark text-center">
+                                                                        <div class="row" id="favouriteData"></div>
+                                                                        <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         }
                                                         else
                                                         {
@@ -175,18 +194,56 @@
                                                                         <p class="task_desc_0">@ticket.Description</p>
                                                                     </td>
                                                                     <td>
-                                                                        <a class="me-2" data-bs-toggle="tooltip"
-                                                                           data-bs-placement="top" title="Edit"
-                                                                           asp-action="Edit" asp-controller="Tickets">
-                                                                            <i data-feather="link"></i>
-                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                        <p class="task_desc_0">@ticket.Created.ToString("MM/dd/yyy")</p>
+                                                                    </td>
+                                                                    @if (User.IsInRole("Admin"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                                asp-controller="Tickets"
                                                                                asp-route-id="@ticket.Id">
-                                                                            <i data-feather="more-horizontal"></i>
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" class="bs-tooltip"
-                                                                           title="Archive"><i data-feather="trash-2"></i></a>
-                                                                    </td>
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket.Id" class="bs-tooltip"
+                                                                               title="Archive"><i data-feather="archive"></i></a>
+                                                                        </td>
+
+                                                                    }
+                                                                    else if (User.IsInRole("ProjectManager"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+
+                                                                        </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                        </td>
+
+                                                                    }
 
                                                                 </tr>
                                                             }
@@ -206,15 +263,25 @@
                                         <div class="card-body p-0">
                                             <div class="taskadd">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="urgentTickets">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
                                                         @if (Model.Tickets.Where(t => t.TicketPriority.Name == "Urgent").Count() == 0)
                                                         {
-                                                            <div class="card-body">
-                                                                <div class="details-bookmark text-center">
-                                                                    <div class="row" id="favouriteData"></div>
-                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                                </div>
-                                                            </div>
+                                                            <tr>
+                                                                <td class="card-body">
+                                                                    <div class="details-bookmark text-center">
+                                                                        <div class="row" id="favouriteData"></div>
+                                                                        <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         }
                                                         else
                                                         {
@@ -234,22 +301,61 @@
                                                                         <p class="task_desc_0">@ticket1.Description</p>
                                                                     </td>
                                                                     <td>
-                                                                        <a class="me-2" data-bs-toggle="tooltip"
-                                                                           data-bs-placement="top" title="Edit"
-                                                                           asp-action="Edit" asp-controller="Tickets">
-                                                                            <i data-feather="link"></i>
-                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                        <p class="task_desc_0">@ticket1.Created.ToString("MM/dd/yyy")</p>
+                                                                    </td>
+                                                                    @if (User.IsInRole("Admin"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                                asp-controller="Tickets"
                                                                                asp-route-id="@ticket1.Id">
-                                                                            <i data-feather="more-horizontal"></i>
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" class="bs-tooltip"
-                                                                           title="Archive"><i data-feather="trash-2"></i></a>
-                                                                    </td>
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket1.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket1.Id" class="bs-tooltip"
+                                                                               title="Archive"><i data-feather="archive"></i></a>
+                                                                        </td>
+
+                                                                    }
+                                                                    else if (User.IsInRole("ProjectManager"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket1.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket1.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+
+                                                                        </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket1.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                        </td>
+
+                                                                    }
 
                                                                 </tr>
                                                             }
                                                         }
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -264,15 +370,25 @@
                                         <div class="card-body p-0">
                                             <div class="taskadd">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="highTickets">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
                                                         @if (Model.Tickets.Where(t => t.TicketPriority.Name == "High").Count() == 0)
                                                         {
-                                                            <div class="card-body">
-                                                                <div class="details-bookmark text-center">
-                                                                    <div class="row" id="favouriteData"></div>
-                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                                </div>
-                                                            </div>
+                                                            <tr>
+                                                                <td class="card-body">
+                                                                    <div class="details-bookmark text-center">
+                                                                        <div class="row" id="favouriteData"></div>
+                                                                        <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         }
                                                         else
                                                         {
@@ -292,22 +408,61 @@
                                                                         <p class="task_desc_0">@ticket2.Description</p>
                                                                     </td>
                                                                     <td>
-                                                                        <a class="me-2" data-bs-toggle="tooltip"
-                                                                           data-bs-placement="top" title="Edit"
-                                                                           asp-action="Edit" asp-controller="Tickets">
-                                                                            <i data-feather="link"></i>
-                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                        <p class="task_desc_0">@ticket2.Created.ToString("MM/dd/yyy")</p>
+                                                                    </td>
+                                                                    @if (User.IsInRole("Admin"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                                asp-controller="Tickets"
                                                                                asp-route-id="@ticket2.Id">
-                                                                            <i data-feather="more-horizontal"></i>
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" class="bs-tooltip"
-                                                                           title="Archive"><i data-feather="trash-2"></i></a>
-                                                                    </td>
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket2.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket2.Id" class="bs-tooltip"
+                                                                               title="Archive"><i data-feather="archive"></i></a>
+                                                                        </td>
+
+                                                                    }
+                                                                    else if (User.IsInRole("ProjectManager"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket2.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket2.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+
+                                                                        </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket2.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                        </td>
+
+                                                                    }
 
                                                                 </tr>
                                                             }
                                                         }
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -322,15 +477,25 @@
                                         <div class="card-body p-0">
                                             <div class="taskadd">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="mediumTickets">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
                                                         @if (Model.Tickets.Where(t => t.TicketPriority.Name == "Medium").Count() == 0)
                                                         {
-                                                            <div class="card-body">
-                                                                <div class="details-bookmark text-center">
-                                                                    <div class="row" id="favouriteData"></div>
-                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                                </div>
-                                                            </div>
+                                                            <tr>
+                                                                <td class="card-body">
+                                                                    <div class="details-bookmark text-center">
+                                                                        <div class="row" id="favouriteData"></div>
+                                                                        <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         }
                                                         else
                                                         {
@@ -350,22 +515,61 @@
                                                                         <p class="task_desc_0">@ticket3.Description</p>
                                                                     </td>
                                                                     <td>
-                                                                        <a class="me-2" data-bs-toggle="tooltip"
-                                                                           data-bs-placement="top" title="Edit"
-                                                                           asp-action="Edit" asp-controller="Tickets">
-                                                                            <i data-feather="link"></i>
-                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                        <p class="task_desc_0">@ticket3.Created.ToString("MM/dd/yyy")</p>
+                                                                    </td>
+                                                                    @if (User.IsInRole("Admin"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                                asp-controller="Tickets"
                                                                                asp-route-id="@ticket3.Id">
-                                                                            <i data-feather="more-horizontal"></i>
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" class="bs-tooltip"
-                                                                           title="Archive"><i data-feather="trash-2"></i></a>
-                                                                    </td>
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket3.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket3.Id" class="bs-tooltip"
+                                                                               title="Archive"><i data-feather="archive"></i></a>
+                                                                        </td>
+
+                                                                    }
+                                                                    else if (User.IsInRole("ProjectManager"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket3.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket3.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+
+                                                                        </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket3.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                        </td>
+
+                                                                    }
 
                                                                 </tr>
                                                             }
                                                         }
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -380,15 +584,25 @@
                                         <div class="card-body p-0">
                                             <div class="taskadd">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="lowTickets">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
                                                         @if (Model.Tickets.Where(t => t.TicketPriority.Name == "Low").Count() == 0)
                                                         {
-                                                            <div class="card-body">
-                                                                <div class="details-bookmark text-center">
-                                                                    <div class="row" id="favouriteData"></div>
-                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                                </div>
-                                                            </div>
+                                                            <tr>
+                                                                <td class="card-body">
+                                                                    <div class="details-bookmark text-center">
+                                                                        <div class="row" id="favouriteData"></div>
+                                                                        <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         }
                                                         else
                                                         {
@@ -408,22 +622,61 @@
                                                                         <p class="task_desc_0">@ticket4.Description</p>
                                                                     </td>
                                                                     <td>
-                                                                        <a class="me-2" data-bs-toggle="tooltip"
-                                                                           data-bs-placement="top" title="Edit"
-                                                                           asp-action="Edit" asp-controller="Tickets">
-                                                                            <i data-feather="link"></i>
-                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                        <p class="task_desc_0">@ticket4.Created.ToString("MM/dd/yyy")</p>
+                                                                    </td>
+                                                                    @if (User.IsInRole("Admin"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                                asp-controller="Tickets"
                                                                                asp-route-id="@ticket4.Id">
-                                                                            <i data-feather="more-horizontal"></i>
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" class="bs-tooltip"
-                                                                           title="Archive"><i data-feather="trash-2"></i></a>
-                                                                    </td>
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket4.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket4.Id" class="bs-tooltip"
+                                                                               title="Archive"><i data-feather="archive"></i></a>
+                                                                        </td>
+
+                                                                    }
+                                                                    else if (User.IsInRole("ProjectManager"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket4.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket4.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+
+                                                                        </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket4.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                        </td>
+
+                                                                    }
 
                                                                 </tr>
                                                             }
                                                         }
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -438,15 +691,25 @@
                                         <div class="card-body p-0">
                                             <div class="taskadd">
                                                 <div class="table-responsive">
-                                                    <table class="table">
+                                                    <table class="table" id="enhanceTickets">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                                <th></th>
+                                                            </tr>
+                                                        </thead>
                                                         @if (Model.Tickets.Where(t => t.TicketType.Name == "Enhancement").Count() == 0)
                                                         {
-                                                            <div class="card-body">
-                                                                <div class="details-bookmark text-center">
-                                                                    <div class="row" id="favouriteData"></div>
-                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                                </div>
-                                                            </div>
+                                                            <tr>
+                                                                <td class="card-body">
+                                                                    <div class="details-bookmark text-center">
+                                                                        <div class="row" id="favouriteData"></div>
+                                                                        <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
                                                         }
                                                         else
                                                         {
@@ -466,22 +729,61 @@
                                                                         <p class="task_desc_0">@ticket5.Description</p>
                                                                     </td>
                                                                     <td>
-                                                                        <a class="me-2" data-bs-toggle="tooltip"
-                                                                           data-bs-placement="top" title="Edit"
-                                                                           asp-action="Edit" asp-controller="Tickets">
-                                                                            <i data-feather="link"></i>
-                                                                        </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                        <p class="task_desc_0">@ticket5.Created.ToString("MM/dd/yyy")</p>
+                                                                    </td>
+                                                                    @if (User.IsInRole("Admin"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                                asp-controller="Tickets"
                                                                                asp-route-id="@ticket5.Id">
-                                                                            <i data-feather="more-horizontal"></i>
-                                                                        </a>
-                                                                        <a href="javascript:void(0)" class="bs-tooltip"
-                                                                           title="Archive"><i data-feather="trash-2"></i></a>
-                                                                    </td>
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket5.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket5.Id" class="bs-tooltip"
+                                                                               title="Archive"><i data-feather="archive"></i></a>
+                                                                        </td>
+
+                                                                    }
+                                                                    else if (User.IsInRole("ProjectManager"))
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket5.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                            <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                               data-bs-placement="top" title="Edit"
+                                                                               asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket5.Id">
+                                                                                <i data-feather="edit-2"></i>
+                                                                            </a>
+
+                                                                        </td>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <td>
+                                                                            <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                               asp-controller="Tickets"
+                                                                               asp-route-id="@ticket5.Id">
+
+                                                                                <i data-feather="info"></i>
+                                                                            </a>
+                                                                        </td>
+
+                                                                    }
 
                                                                 </tr>
                                                             }
                                                         }
+
                                                     </table>
                                                 </div>
                                             </div>
@@ -495,15 +797,25 @@
                                         </div>
                                         <div class="taskadd">
                                             <div class="table-responsive">
-                                                <table class="table">
+                                                <table class="table" id="changeTickets">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
                                                     @if (Model.Tickets.Where(t => t.TicketType.Name == "ChangeRequest").Count() == 0)
                                                     {
-                                                        <div class="card-body">
-                                                            <div class="details-bookmark text-center">
-                                                                <div class="row" id="favouriteData"></div>
-                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                            </div>
-                                                        </div>
+                                                        <tr>
+                                                            <td class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     }
                                                     else
                                                     {
@@ -523,22 +835,61 @@
                                                                     <p class="task_desc_0">@ticket6.Description</p>
                                                                 </td>
                                                                 <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                    <p class="task_desc_0">@ticket6.Created.ToString("MM/dd/yyy")</p>
+                                                                </td>
+                                                                @if (User.IsInRole("Admin"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                            asp-controller="Tickets"
                                                                            asp-route-id="@ticket6.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket6.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket6.Id" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="archive"></i></a>
+                                                                    </td>
+
+                                                                }
+                                                                else if (User.IsInRole("ProjectManager"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket6.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket6.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket6.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                    </td>
+
+                                                                }
 
                                                             </tr>
                                                         }
                                                     }
+
                                                 </table>
                                             </div>
                                         </div>
@@ -551,15 +902,25 @@
                                         </div>
                                         <div class="taskadd">
                                             <div class="table-responsive">
-                                                <table class="table">
+                                                <table class="table" id="defectTickets">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
                                                     @if (Model.Tickets.Where(t => t.TicketType.Name == "Defect").Count() == 0)
                                                     {
-                                                        <div class="card-body">
-                                                            <div class="details-bookmark text-center">
-                                                                <div class="row" id="favouriteData"></div>
-                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                            </div>
-                                                        </div>
+                                                        <tr>
+                                                            <td class="card-body" colspan="3">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     }
                                                     else
                                                     {
@@ -579,22 +940,61 @@
                                                                     <p class="task_desc_0">@ticket7.Description</p>
                                                                 </td>
                                                                 <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                    <p class="task_desc_0">@ticket7.Created.ToString("MM/dd/yyy")</p>
+                                                                </td>
+                                                                @if (User.IsInRole("Admin"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                            asp-controller="Tickets"
                                                                            asp-route-id="@ticket7.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket7.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket7.Id" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="archive"></i></a>
+                                                                    </td>
+
+                                                                }
+                                                                else if (User.IsInRole("ProjectManager"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket7.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket7.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket7.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                    </td>
+
+                                                                }
 
                                                             </tr>
                                                         }
                                                     }
+
                                                 </table>
                                             </div>
                                         </div>
@@ -607,15 +1007,25 @@
                                         </div>
                                         <div class="taskadd">
                                             <div class="table-responsive">
-                                                <table class="table">
+                                                <table class="table" id="workTickets">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
                                                     @if (Model.Tickets.Where(t => t.TicketType.Name == "WorkTask").Count() == 0)
                                                     {
-                                                        <div class="card-body">
-                                                            <div class="details-bookmark text-center">
-                                                                <div class="row" id="favouriteData"></div>
-                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                            </div>
-                                                        </div>
+                                                        <tr>
+                                                            <td class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     }
                                                     else
                                                     {
@@ -635,22 +1045,61 @@
                                                                     <p class="task_desc_0">@ticket7.Description</p>
                                                                 </td>
                                                                 <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                    <p class="task_desc_0">@ticket7.Created.ToString("MM/dd/yyy")</p>
+                                                                </td>
+                                                                @if (User.IsInRole("Admin"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                            asp-controller="Tickets"
                                                                            asp-route-id="@ticket7.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket7.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket7.Id" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="archive"></i></a>
+                                                                    </td>
+
+                                                                }
+                                                                else if (User.IsInRole("ProjectManager"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket7.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket7.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket7.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                    </td>
+
+                                                                }
 
                                                             </tr>
                                                         }
                                                     }
+
                                                 </table>
                                             </div>
                                         </div>
@@ -663,15 +1112,25 @@
                                         </div>
                                         <div class="taskadd">
                                             <div class="table-responsive">
-                                                <table class="table">
+                                                <table class="table" id="newTickets">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
                                                     @if (Model.Tickets.Where(t => t.TicketType.Name == "NewDevelopment").Count() == 0)
                                                     {
-                                                        <div class="card-body">
-                                                            <div class="details-bookmark text-center">
-                                                                <div class="row" id="favouriteData"></div>
-                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                            </div>
-                                                        </div>
+                                                        <tr>
+                                                            <td class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     }
                                                     else
                                                     {
@@ -691,22 +1150,61 @@
                                                                     <p class="task_desc_0">@ticket8.Description</p>
                                                                 </td>
                                                                 <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                    <p class="task_desc_0">@ticket8.Created.ToString("MM/dd/yyy")</p>
+                                                                </td>
+                                                                @if (User.IsInRole("Admin"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                            asp-controller="Tickets"
                                                                            asp-route-id="@ticket8.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket8.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket8.Id" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="archive"></i></a>
+                                                                    </td>
+
+                                                                }
+                                                                else if (User.IsInRole("ProjectManager"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket8.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket8.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket8.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                    </td>
+
+                                                                }
 
                                                             </tr>
                                                         }
                                                     }
+
                                                 </table>
                                             </div>
                                         </div>
@@ -719,15 +1217,25 @@
                                         </div>
                                         <div class="taskadd">
                                             <div class="table-responsive">
-                                                <table class="table">
+                                                <table class="table" id="generalTickets">
+                                                    <thead>
+                                                        <tr>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
                                                     @if (Model.Tickets.Where(t => t.TicketType.Name == "GeneralTask").Count() == 0)
                                                     {
-                                                        <div class="card-body">
-                                                            <div class="details-bookmark text-center">
-                                                                <div class="row" id="favouriteData"></div>
-                                                                <div class="no-favourite"><span>No Tickets Yet.</span></div>
-                                                            </div>
-                                                        </div>
+                                                        <tr>
+                                                            <td class="card-body">
+                                                                <div class="details-bookmark text-center">
+                                                                    <div class="row" id="favouriteData"></div>
+                                                                    <div class="no-favourite"><span>No Tickets Yet.</span></div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
                                                     }
                                                     else
                                                     {
@@ -747,22 +1255,61 @@
                                                                     <p class="task_desc_0">@ticket9.Description</p>
                                                                 </td>
                                                                 <td>
-                                                                    <a class="me-2" data-bs-toggle="tooltip"
-                                                                       data-bs-placement="top" title="Edit"
-                                                                       asp-action="Edit" asp-controller="Tickets">
-                                                                        <i data-feather="link"></i>
-                                                                    </a><a class="bs-tooltip" title="View" asp-action="Details"
+                                                                    <p class="task_desc_0">@ticket9.Created.ToString("MM/dd/yyy")</p>
+                                                                </td>
+                                                                @if (User.IsInRole("Admin"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
                                                                            asp-controller="Tickets"
                                                                            asp-route-id="@ticket9.Id">
-                                                                        <i data-feather="more-horizontal"></i>
-                                                                    </a>
-                                                                    <a href="javascript:void(0)" class="bs-tooltip"
-                                                                       title="Archive"><i data-feather="trash-2"></i></a>
-                                                                </td>
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket9.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-danger btn-sm" asp-action="Archive" asp-controller="Tickets" asp-route-id="@ticket9.Id" class="bs-tooltip"
+                                                                           title="Archive"><i data-feather="archive"></i></a>
+                                                                    </td>
+
+                                                                }
+                                                                else if (User.IsInRole("ProjectManager"))
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket9.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                        <a class="btn btn-primary btn-sm" data-bs-toggle="tooltip"
+                                                                           data-bs-placement="top" title="Edit"
+                                                                           asp-action="Edit" asp-controller="Tickets" asp-route-id="@ticket9.Id">
+                                                                            <i data-feather="edit-2"></i>
+                                                                        </a>
+
+                                                                    </td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <td>
+                                                                        <a class="btn btn-warning btn-sm" title="View" asp-action="Details"
+                                                                           asp-controller="Tickets"
+                                                                           asp-route-id="@ticket9.Id">
+
+                                                                            <i data-feather="info"></i>
+                                                                        </a>
+                                                                    </td>
+
+                                                                }
 
                                                             </tr>
                                                         }
                                                     }
+
                                                 </table>
                                             </div>
                                         </div>
@@ -801,5 +1348,74 @@
             </div>
         </div>
 
-    </div>
-</div>
+        @section scripts {
+            <script src="//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+
+            <script>
+                $(document).ready(function () {
+                    $('#allTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#urgentTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#highTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#mediumTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#lowTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#enhanceTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#changeTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#defectTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#workTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#newTickets').DataTable();
+                });
+
+            </script>
+            <script>
+                $(document).ready(function () {
+                    $('#generalTickets').DataTable();
+                });
+
+            </script>
+        }

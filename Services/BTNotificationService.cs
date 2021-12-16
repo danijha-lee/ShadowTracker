@@ -136,9 +136,9 @@ namespace ShadowTracker.Services
             try
             {
                 List<Notification> notifications = await GetReceivedNotificationsAsync(userId);
-                var projectNotifyId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Project))).Id;
-                var ticketNotifyId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Ticket))).Id;
-                return notifications.Where(n => n.NotificationTypeId == projectNotifyId || n.NotificationTypeId == ticketNotifyId).ToList();
+                var chatNotifyId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Chat))).Id;
+
+                return notifications.Where(n => n.NotificationTypeId != chatNotifyId).ToList();
             }
             catch (Exception)
             {

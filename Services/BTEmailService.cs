@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using ShadowTracker.Models;
+using System.IO;
 
 namespace ShadowTracker.Services
 {
@@ -38,14 +39,16 @@ namespace ShadowTracker.Services
             email.To.Add(MailboxAddress.Parse(emailTo));
             email.Subject = subject;
 
-            var builder = new BodyBuilder
-            {
-                HtmlBody = htmlMessage
-            };
+            var builder = new BodyBuilder();
 
+            using (StreamReader sourceReader = System.IO.File.OpenText("wwwroot/EmailTemplate.txt"))
+            {
+                builder.HtmlBody = sourceReader.ReadToEnd().Replace("Monae Lee", htmlMessage);
+            //builder.HtmlBody.Replace("<<Monae Lee>>", htmlMessage);
+            }
             email.Body = builder.ToMessageBody();
 
-            try
+            try  
             {
                 using var smtp = new SmtpClient();
                 smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ShadowTracker.Data;
@@ -9,9 +10,10 @@ using ShadowTracker.Data;
 namespace ShadowTracker.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211216095158_ToDo")]
+    partial class ToDo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -724,32 +726,6 @@ namespace ShadowTracker.Data.Migrations
                     b.ToTable("TicketTypes");
                 });
 
-            modelBuilder.Entity("ShadowTracker.Models.ToDo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<bool>("Deleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("Done")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("OwnerUserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OwnerUserId");
-
-                    b.ToTable("ToDos");
-                });
-
             modelBuilder.Entity("BTUserProject", b =>
                 {
                     b.HasOne("ShadowTracker.Models.BTUser", null)
@@ -1041,15 +1017,6 @@ namespace ShadowTracker.Data.Migrations
                     b.Navigation("TaskType");
 
                     b.Navigation("Ticket");
-                });
-
-            modelBuilder.Entity("ShadowTracker.Models.ToDo", b =>
-                {
-                    b.HasOne("ShadowTracker.Models.BTUser", "OwnerUser")
-                        .WithMany()
-                        .HasForeignKey("OwnerUserId");
-
-                    b.Navigation("OwnerUser");
                 });
 
             modelBuilder.Entity("ShadowTracker.Models.Company", b =>

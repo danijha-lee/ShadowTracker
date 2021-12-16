@@ -7,6 +7,8 @@
 @{
     ViewData["Title"] = "Index";
     BTUser user = await _userManager.GetUserAsync(User);
+    List<Notification> sent = await _notificationService.GetSentNotificationsAsync(user.Id);
+    List<Notification> received = await _notificationService.GetReceivedNotificationsAsync(user.Id);
 }
 
 <!-- Container-fluid starts-->
@@ -19,32 +21,36 @@
                     <div class="email-left-aside">
                         <div class="card">
                             <div class="card-body">
-                                <div class="email-app-sidebar">
+                                <div class="email-app-sidebar" >
                                     <div class="media">
-                                        <div class="media-size-email"><img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt=""></div>
+                                        <div class="media-size-email">
+                                            @if (user.AvatarFileData != null)
+                                            {
+                                                <img class="me-3 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(user.AvatarFileData))" width="64" height="64" alt="...">
+                                            }
+                                            else
+                                            {
+
+
+                                                <img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt="">
+                                            }
+                                        </div>
                                         <div class="media-body">
-                                            <h6 class="f-w-600">MARKJENCO</h6>
-                                            <p>Markjecno@gmail.com</p>
+                                            <h6 class="f-w-600">@user.FullName</h6>
+                                            <p>@user.Email</p>
                                         </div>
                                     </div>
                                     <ul class="nav main-menu" role="tablist">
-                                        <li class="nav-item"><a class="btn-primary btn-block btn-mail w-100" id="pills-darkhome-tab" data-bs-toggle="pill" href="#pills-darkhome" role="tab" aria-controls="pills-darkhome" aria-selected="true"><i class="icofont icofont-envelope me-2"></i> NEW MAIL</a></li>
-                                        <li class="nav-item"><a class="show" id="pills-darkprofile-tab" data-bs-toggle="pill" href="#pills-darkprofile" role="tab" aria-controls="pills-darkprofile" aria-selected="false"><span class="title"><i class="icon-import"></i> Inbox</span><span class="badge pull-right">(236)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-folder"></i> All mail</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-new-window"></i> Sent</span><span class="badge pull-right">(69)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-pencil-alt"></i> DRAFT</span><span class="badge pull-right">(59)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-trash"></i> TRASH</span><span class="badge pull-right">(99)</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-info-alt"></i> IMPORTANT</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-star"></i> Starred</span></a></li>
-                                        <li>
-                                            <hr>
-                                        </li>
-                                        <li><a href="#"><span class="title"><i class="icon-email"></i> UNREAD</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-export"></i> SPAM</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-share"></i> OUTBOX</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-file"></i> UPDATE</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-bell"></i> ALERT</span></a></li>
-                                        <li><a href="#"><span class="title"><i class="icon-notepad"></i> NOTES</span><span class="badge pull-right">(20)</span></a></li>
+                                        <li class="nav-item"><a class="btn-primary btn-block btn-mail w-100" asp-action="Create" asp-controller="Notifications" role="tab" aria-controls="pills-darkhome" aria-selected="true"><i class="icofont icofont-envelope me-2"></i> NEW MESSAGE</a></li>
+                                        <li class="nav-item"><a class="show" asp-action="Index" asp-controller="Notifications"><span class="title"><i class="icon-import"></i> Inbox</span><span class="badge pull-right">(@received.Count())</span></a></li>
+
+                                        <li><a asp-action="Sent" asp-controller="Notifications"><span class="title"><i class="icon-new-window"></i> Sent</span><span class="badge pull-right">(@sent.Count())</span></a></li>
+                                        @*<li><a href="#"><span class="title"><i class="icon-pencil-alt"></i> DRAFT</span><span class="badge pull-right">(59)</span></a></li>
+                                        <li><a href="#"><span class="title"><i class="icon-trash"></i> TRASH</span><span class="badge pull-right">(99)</span></a></li>*@
+                                        @*<li><a href="#"><span class="title"><i class="icon-info-alt"></i> IMPORTANT</span></a></li>*@
+                                        
+                                       
+                                       
                                     </ul>
                                 </div>
                             </div>
@@ -68,21 +74,41 @@
                                     </div>
                                 </div>
                                 <div class="inbox">
+                                    @if (received.Count == 0)
+                                    {
+                                        <div class="media-body text-center">
+
+                                            <p class="text-center p-5">No Notifications Yet.</p>
+                                        </div>
+                                    }
                                     @foreach (Notification notification in await _notificationService.GetReceivedNotificationsAsync(user.Id))
                                     {
-                        <div class="media">
-                            <div class="media-size-email">
-                                <label class="d-block mb-0" for="chk-ani">
-                                   
-                                </label><img class="me-3 rounded-circle" src="../assets/images/user/user.png" alt="">
-                            </div>
-                            <a asp-action="Details" asp-controller="Notifications" asp-route-id="@notification.Id">
-                                <div class="media-body">
-                                    <h6>@notification.Sender.FullName </h6>
-                                    <p>@notification.Message</p><span>@notification.Created.ToString("ddd. MMM dd")</span>
-                                </div>
-                            </a>
-                        </div>
+                                        <div class="media">
+                                            <div class="media-size-email">
+                                                <label class="d-block mb-0" for="chk-ani">
+
+                                                </label>
+                                                @if (notification.Sender.AvatarFileData != null)
+                                                {
+                                                    <img class="me-3 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(notification.Sender.AvatarFileData))" width="32" height="32" alt="...">
+                                                }
+                                                else
+                                                {
+
+
+                                                    <img class="me-3 rounded-circle" src="/assets/images/user/user.png" alt="">
+                                                }
+
+                                            </div>
+                                            <a asp-action="Details" asp-controller="Notifications" asp-route-id="@notification.Id">
+                                                <div class="media-body">
+
+                                                    <h6>@notification.Sender.FullName </h6>
+                                                    &emsp;<div class="text-black-50"> @notification.Title</div><span>@notification.Created.ToString("ddd. MMM dd")</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <hr class="mt-1 mb-1" />
                                     }
 
                                 </div>

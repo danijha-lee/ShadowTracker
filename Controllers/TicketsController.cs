@@ -156,11 +156,34 @@ namespace ShadowTracker.Controllers
                 string userId = _userManager.GetUserId(User);
                 try
                 {
+                    BTUser btUser = await _userManager.GetUserAsync(User);
+                    int companyId = User.Identity.GetCompanyId().Value;
                     //ticketComment.TicketId = ticketComment.TicketId;
                     ticketComment.Created = DateTime.Now;
                     ticketComment.UserId = userId;
                     await _ticketService.AddTicketCommentAsync(ticketComment);
                     await _ticketHistoryService.AddHistoryAsync(ticketComment.TicketId, nameof(TicketComment), ticketComment.UserId);
+
+                    Notification notification = new()
+                    {
+                        TicketId = ticketComment.TicketId,
+                        NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.Comment))).Value,
+                        Title = " Ticekt Comment Added",
+                        Message = $"A comment was added to the  : {ticketComment.Ticket.Project.Name} Project, for the ticket {ticketComment.Ticket.Title} by {btUser.FullName}",
+                        SenderId = btUser.Id,
+                    };
+
+                    List<BTUser> members = new();
+                    members.Add(ticketComment.Ticket.DeveloperUser);
+                    members.Add(ticketComment.Ticket.OwnerUser);
+
+                    await _notificationService.AddNotificationAsync(notification);
+                    await _notificationService.SendMembersEmailNotificationsAsync(notification, members);
+                    BTUser projectManager = await _projectService.GetProjectManagerAsync(ticketComment.Ticket.ProjectId);
+                    if (projectManager != null)
+                    {
+                        await _notificationService.SendEmailNotificationsByRoleAsync(notification, companyId, nameof(BTRoles.ProjectManager));
+                    }
 
                     return RedirectToAction(nameof(Details), new { id = ticketComment.TicketId });
                 }
@@ -180,6 +203,9 @@ namespace ShadowTracker.Controllers
 
             if (ModelState.IsValid && ticketAttachment.FormFile != null)
             {
+                BTUser btUser = await _userManager.GetUserAsync(User);
+                int companyId = User.Identity.GetCompanyId().Value;
+
                 ticketAttachment.FileData = await _fileService.ConvertFileToByteArrayAsync(ticketAttachment.FormFile);
                 ticketAttachment.FileName = ticketAttachment.FormFile.FileName;
                 ticketAttachment.FileContentType = ticketAttachment.FormFile.ContentType;
@@ -195,7 +221,7 @@ namespace ShadowTracker.Controllers
                 statusMessage = "Error: Invalid data.";
             }
 
-            return RedirectToAction("Details", new { id = ticketAttachment.TicketId, message = statusMessage });
+            return RedirectToAction("Details", "Tickets", new { id = ticketAttachment.TicketId, message = statusMessage }, "attachments");
         }
 
         // GET: Tickets/Create
@@ -251,7 +277,7 @@ namespace ShadowTracker.Controllers
                         Created = DateTime.Now,
                         SenderId = userId,
                         RecipientId = projectManager?.Id,
-                        NotificationTypeId = 0
+                        NotificationTypeId = (await _lookupService.LookupNotificationTypeId(nameof(BTNotificationTypes.UserAdded))).Value
                     };
                     await _notificationService.AddNotificationAsync(notification);
                     if (projectManager != null)
@@ -327,7 +353,7 @@ namespace ShadowTracker.Controllers
                 }
                 Ticket newTicket = await _ticketService.GetTicketAsNoTrackingAsync(ticket.Id);
                 await _ticketHistoryService.AddHistoryAsync(oldTicket, newTicket, userId);
-                return RedirectToAction(nameof(AllTickets));
+                return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
             int companyId = User.Identity.GetCompanyId().Value;
 
