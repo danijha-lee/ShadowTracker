@@ -20,7 +20,6 @@
     List<BTUser> projectManagers = await _rolesService.GetUsersInRoleAsync(nameof(BTRoles.ProjectManager), companyId);
     int pmCount = projectManagers.Count;
 
-
 }
 
 <!-- Container-fluid starts-->
@@ -91,38 +90,38 @@
                                                     }
                                                     else
                                                     {
-                                                    @if (projectManager != null)
-                                                    {
-                                                        @if (projectManager.AvatarFileData != null)
+                                                        @if (projectManager != null)
                                                         {
-                                                            <img class="img-20 me-2 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(projectManager.AvatarFileData))" alt="" data-original-title="" title="">
-                                                        }
-                                                        else
-                                                        {
-                                                            <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
-                                                        }
-                                                        <div class="media-body">
-                                                            <p> Project Manager : @projectManager.FullName</p>
-                                                        </div>
-                                                    }
-                                                    else
-                                                    {
-
-                                                        @if (User.IsInRole("Admin"))
-                                                        {
-
+                                                            @if (projectManager.AvatarFileData != null)
+                                                            {
+                                                                <img class="img-20 me-2 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(projectManager.AvatarFileData))" alt="" data-original-title="" title="">
+                                                            }
+                                                            else
+                                                            {
+                                                                <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
+                                                            }
                                                             <div class="media-body">
-                                                                <a class="btn btn-warning" asp-action="AssignPm" asp-controller="Projects" asp-route-id="@project.Id"><i class="icon-user"></i>&emsp;Assign Manager</a>
+                                                                <p> Project Manager : @projectManager.FullName</p>
                                                             </div>
                                                         }
                                                         else
                                                         {
-                                                            <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
-                                                            <div class="media-body">
-                                                                <p> Project Manager : Not Assigned</p>
-                                                            </div>
+
+                                                            @if (User.IsInRole("Admin"))
+                                                            {
+
+                                                                <div class="media-body">
+                                                                    <a class="btn btn-warning" asp-action="AssignPm" asp-controller="Projects" asp-route-projectId="@project.Id"><i class="icon-user"></i>&emsp;Assign Manager</a>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
+                                                                <div class="media-body">
+                                                                    <p> Project Manager : Not Assigned</p>
+                                                                </div>
+                                                            }
                                                         }
-                                                    }
                                                     }
                                                 </div>
                                                 <p></p>
@@ -218,7 +217,7 @@
                                                             {
 
                                                                 <div class="media-body">
-                                                                    <a class="btn btn-warning btn-sm" asp-action="AssignPm" asp-controller="Projects" asp-route-id="@project.Id"><i class="icon-user"></i>&emsp;Assign Manager</a>
+                                                                    <a class="btn btn-warning btn-sm" asp-action="AssignPm" asp-controller="Projects" asp-route-projectId="@project.Id"><i class="icon-user"></i>&emsp;Assign Manager</a>
                                                                 </div>
                                                             }
                                                             else
@@ -230,7 +229,7 @@
                                                             }
                                                         }
                                                     }
-                                                    </div>
+                                                </div>
                                                 <p></p>
                                                 <div class="row details">
                                                     <div class="col-6"><span> Issues</span></div>
@@ -310,49 +309,49 @@
                                                 {
                                                     <h6>@project.Name</h6>
                                                 }
-                                            <div class="media">
-                                                @if (pmCount == 0 && User.IsInRole("Admin"))
-                                                {
-                                                    <div class="media-body">
-                                                        <a class="btn btn-warning" asp-action="Create" asp-controller="Invites"><i class="icon-user"></i>&emsp;Invite Manager</a>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    @if (projectManager != null)
+                                                <div class="media">
+                                                    @if (pmCount == 0 && User.IsInRole("Admin"))
                                                     {
-                                                        @if (projectManager.AvatarFileData != null)
-                                                        {
-                                                            <img class="img-20 me-2 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(projectManager.AvatarFileData))" alt="" data-original-title="" title="">
-                                                        }
-                                                        else
-                                                        {
-                                                            <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
-                                                        }
                                                         <div class="media-body">
-                                                            <p> Project Manager : @projectManager.FullName</p>
+                                                            <a class="btn btn-warning" asp-action="Create" asp-controller="Invites"><i class="icon-user"></i>&emsp;Invite Manager</a>
                                                         </div>
                                                     }
-
                                                     else
                                                     {
-
-                                                        @if (User.IsInRole("Admin"))
+                                                        @if (projectManager != null)
                                                         {
-
+                                                            @if (projectManager.AvatarFileData != null)
+                                                            {
+                                                                <img class="img-20 me-2 rounded-circle" src="data:image/*;base64,@(Convert.ToBase64String(projectManager.AvatarFileData))" alt="" data-original-title="" title="">
+                                                            }
+                                                            else
+                                                            {
+                                                                <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
+                                                            }
                                                             <div class="media-body">
-                                                                <a class="btn btn-warning btn-sm" asp-action="AssignPm" asp-controller="Projects" asp-route-id="@project.Id"><i class="icon-user"></i>&emsp;Assign Manager</a>
+                                                                <p> Project Manager : @projectManager.FullName</p>
                                                             </div>
                                                         }
+
                                                         else
                                                         {
-                                                            <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
-                                                            <div class="media-body">
-                                                                <p> Project Manager : Not Assigned</p>
-                                                            </div>
+
+                                                            @if (User.IsInRole("Admin"))
+                                                            {
+
+                                                                <div class="media-body">
+                                                                    <a class="btn btn-warning btn-sm" asp-action="AssignPm" asp-controller="Projects" asp-route-projectId="@project.Id"><i class="icon-user"></i>&emsp;Assign Manager</a>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <img class="img-20 me-2 rounded-circle" src="../assets/images/user/user.png" alt="" data-original-title="" title="">
+                                                                <div class="media-body">
+                                                                    <p> Project Manager : Not Assigned</p>
+                                                                </div>
+                                                            }
                                                         }
                                                     }
-                                                }
                                                 </div>
                                                 <p></p>
                                                 <div class="row details">
@@ -363,7 +362,7 @@
                                                     <div class="col-6"> <span>Comments</span></div>
                                                     <div class="col-6 font-primary">@(await _ticketService.GetProjectCommentCountAsync(project.Id))</div>
                                                 </div>
-                                                
+
                                                 <div class="project-status mt-4">
                                                     @{
                                                         var start = project.StartDate.Value;
@@ -426,14 +425,12 @@
                                         </div>
                                     </div>
                                     <div class="row">
-
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="mb-3">
                                             <label>Project Manager</label>
                                             <select class="form-select" asp-items="ViewBag.ProjectManager">
                                                 <option>Choose...</option>
-
                                             </select>
                                         </div>
                                     </div>
@@ -442,7 +439,6 @@
                                             <label>Priority</label>
                                             <select class="form-select" asp-items="ViewBag.ProjectPriority">
                                                 <option>Choose..</option>
-
                                             </select>
                                         </div>
                                     </div>
@@ -502,7 +498,6 @@
     </div>
 </div>
                     </div>
-
             </div>
         </div>
     </div>
