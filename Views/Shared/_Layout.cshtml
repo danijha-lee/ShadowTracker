@@ -106,6 +106,13 @@
                                 <li>
                                     <p class="f-w-700 mb-0"> Notifications<span class="pull-right badge badge-primary badge-pill"></span></p>
                                 </li>
+
+                                @if ((await _notificationService.GetNotificationAlertsAsync(user.Id)).Count == 0)
+                                {
+                                    <li>
+                                        <p>No Notifications</p>
+                                    </li>
+                                }
                                 @foreach (Notification notification1 in await _notificationService.GetNotificationAlertsAsync(user.Id))
                                 {
 
@@ -157,6 +164,15 @@
                         <li class="onhover-dropdown">
                             <i data-feather="message-square"></i>
                             <ul class="chat-dropdown onhover-show-div">
+                                @if ((await _notificationService.GetChatAlertsAsync(user.Id)).Count == 0)
+                                {
+                                    <li>
+                                        <p class="f-w-700 mb-0"> Messages<span class="pull-right badge badge-primary badge-pill"></span></p>
+                                    </li>
+                                    <li>
+                                        <p>No Messages</p>
+                                    </li>
+                                }
                                 @foreach (Notification notification in await _notificationService.GetChatAlertsAsync(user.Id))
                                 {
 
@@ -181,7 +197,7 @@
                                     </li>
 
                                 }
-                                <li class="text-center"> <a class="f-w-700" asp-action="Index" asp-controller="Notifications">See All     </a></li>
+                                <li class="text-center"> <a class="f-w-700" asp-action="Index" asp-controller="Notifications">See All </a></li>
                             </ul>
                         </li>
                         <li class="onhover-dropdown p-0">
@@ -227,7 +243,7 @@
                         </li>
                         <li>
                             <br />
-                            <p class="text-warning">ACTIVE </p>
+                            <p class="badge badge-pill badge-secondary text-success ">online </p>
                         </li>
                     </ul>
                 </div>
@@ -301,7 +317,6 @@
                                     </li>
                                 }
                                 <li class="dropdown"><a class="nav-link menu-title link-nav" asp-action="Index" asp-controller="ToDoes"><i data-feather="clock"></i><span>To-Do</span></a></li>
-
 
                                 <li class="dropdown">
                                     <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather="edit-3"></i><span>Notifications</span></a>

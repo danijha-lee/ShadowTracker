@@ -100,7 +100,7 @@
                         </div>
                         <div class="col-xl-6 col-xs-12 col-md-6 col-sm-6">
                             <div class="cal-datepicker">
-                                <div class="datepicker-here float-sm-end" data-language="en">           </div>
+                                <div class="datepicker-here float-sm-end" data-language="en"></div>
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
         </div>
 
 
-        <div class="col-xl-6 box-col-12 des-xl-100  mb-5  top-dealer-sec">
+        <div class="col-xl-6 box-col-12 des-xl-100 col-md-12 mb-5  top-dealer-sec">
             <div class="card minHeight">
                 <div class="card-header pb-0">
                     <div class="header-top d-sm-flex justify-content-between align-items-center">
@@ -190,7 +190,8 @@
                         <div class="card social-widget-card">
                             <div class="card-body">
                                 <div class="redial-social-widget radial-bar-70" data-label="@percent%"><i class="fa fa-clipboard font-primary"></i></div>
-                                <h5 class="b-b-light">@project.Name</h5>
+                                <a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id"> <h5 class="b-b-light">@project.Name</h5></a>
+
                                 <div class="row">
                                     <div class="col text-center b-r-light">
                                         <span>Tickets</span>
@@ -219,7 +220,8 @@
                         <div class="card social-widget-card">
                             <div class="card-body">
                                 <div class="redial-social-widget radial-bar-70" data-label="@percent%"><i class="fa fa-clipboard font-primary"></i></div>
-                                <h5 class="b-b-light">@project.Name</h5>
+                                <a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id"> <h5 class="b-b-light">@project.Name</h5></a>
+                           
                                 <div class="row">
                                     <div class="col text-center b-r-light">
                                         <span>Tickets</span>
@@ -248,7 +250,7 @@
                     <div class="card social-widget-card">
                         <div class="card-body">
                             <div class="redial-social-widget radial-bar-70" data-label="@percent%"><i class="fa fa-clipboard font-primary"></i></div>
-                            <h5 class="b-b-light">@project.Name</h5>
+                            <a asp-action="Details" asp-controller="Projects" asp-route-id="@project.Id"> <h5 class="b-b-light">@project.Name</h5></a>
                             <div class="row">
                                 <div class="col text-center b-r-light">
                                     <span>Tickets</span>
@@ -336,7 +338,7 @@
                                         }
                                         <td>@ticket.TicketPriority.Name</td>
                                         <td>@ticket.TicketType.Name</td>
-                                        <td>@ticket.Created.ToString("dd/MM/yy")</td>
+                                        <td>@ticket.Created.ToString("MM/dd/yy")</td>
                                     </tr>
                                 }
                             </tbody>
@@ -367,7 +369,7 @@
                                         <div class="activity-line"></div>
                                         <div class="activity-dot-primary"></div>
                                         <div class="media-body d-block">
-                                            <h6><span class="font-primary">@ticketHistory.Created.ToString("dd-MM-yyyy")</span></h6>
+                                            <h6><span class="font-primary">@ticketHistory.Created.ToString("MM-dd-yyyy")</span></h6>
                                             <h5>@ticketHistory.Property</h5>
                                             <p>@ticketHistory.Description</p>
                                         </div>
