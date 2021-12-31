@@ -293,7 +293,7 @@ namespace ShadowTracker.Controllers
                 {
                     throw;
                 }
-                return RedirectToAction("Details", "Projects", new { id = ticket.ProjectId });
+                return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
 
             return View(ticket);

@@ -30,24 +30,24 @@
                             <h3>@Model.Title</h3>
                             @*Description of Ticket*@
                             <p>@Model.Description</p>
-                            <div class="progress-container progress-info m-b-25">
+                            <!--<div class="progress-container progress-info m-b-25">-->
                                 @*Project Name and information*@
                                 <span class="progress-badge" style="font-size:small">Project: @Model.Project.Name</span>
-                                <div class="progress">
+                                <!--<div class="progress">-->
                                     @*Progress bar logic*@
-                                    @{
+                                    <!--@{
                                         var start = Model.Project.StartDate.Value;
                                         var end = Model.Project.EndDate.Value;
                                         var today = DateTime.Now;
                                         var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
-                                    }
+                                    }-->
                                     @*Variable from razor logic*@
-                                    <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:@percent;">
+                                    <!--<div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" width="@percent">-->
                                         @*Variable from razor logic*@
-                                        <span class="progress-value">@percent%</span>
+                                        <!--<span class="progress-value">@percent%</span>
                                     </div>
                                 </div>
-                            </div>
+                            </div>-->
                         </div>
                     </div>
                     <div class="card col m-1 p-2">
