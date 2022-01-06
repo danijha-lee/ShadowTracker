@@ -20,7 +20,7 @@
           jQuery('.submenu-title').click(function () {
               jQuery('.submenu-title').removeClass('active');
               jQuery('.submenu-title').find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-              jQuery('.submenu-content').slideUp('normal');
+              //jQuery('.submenu-content').slideUp('normal');
               if (jQuery(this).next().is(':hidden') == true) {
                   jQuery(this).addClass('active');
                   jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-down"></i></div>');
@@ -35,7 +35,7 @@
           jQuery('.menu-title').click(function () {
               jQuery('.menu-title').removeClass('active');
               jQuery('.menu-title').find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-              jQuery('.menu-content').slideUp('normal');
+              //jQuery('.menu-content').slideUp('normal');
               if (jQuery(this).next().is(':hidden') == true) {
                   jQuery(this).addClass('active');
                   jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-down"></i></div>');
@@ -54,7 +54,7 @@
           jQuery('.submenu-title').click(function () {
               jQuery('.submenu-title').removeClass('active');
               jQuery('.submenu-title').find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-right"></i></div>');
-              jQuery('.submenu-content').slideUp('normal');
+              //jQuery('.submenu-content').slideUp('normal');
               if (jQuery(this).next().is(':hidden') == true) {
                   jQuery(this).addClass('active');
                   jQuery(this).find('div').replaceWith('<div class="according-menu"><i class="fa fa-angle-down"></i></div>');
